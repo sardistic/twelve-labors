@@ -28,16 +28,23 @@ const difficultyLabels: Record<Difficulty, string> = {
 
 const buildEmptySets = (count: number) => Array.from({ length: count }, () => ({ weight: '', reps: '' }))
 
+const noteTags = ['felt strong', 'pain', 'machine taken', 'low energy', 'form check', 'add weight', 'repeat load']
+
+const parseTags = (notes: string) => notes.split(',').map((tag) => tag.trim()).filter(Boolean)
+
+const serializeTags = (tags: string[]) => Array.from(new Set(tags.map((tag) => tag.trim()).filter(Boolean))).join(', ')
+
 export function ExerciseCard({ slot, value, previous, isActive, onChange, onActivate, onNext, onShowHistory }: Props) {
   const initialOptionName = value?.selectedOptionName ?? slot.options[0]?.name ?? ''
   const [selectedOptionName, setSelectedOptionName] = useState(initialOptionName)
+  const [customTag, setCustomTag] = useState('')
   const selectedOption = (slot.options.find((option) => option.name === selectedOptionName) ?? slot.options[0])!
 
   useEffect(() => {
     setSelectedOptionName(value?.selectedOptionName ?? slot.options[0]?.name ?? '')
   }, [slot.id, slot.options, value?.selectedOptionName])
   const log = useMemo<ExerciseLog>(() => {
-    const sets = value?.sets?.length ? value.sets : buildEmptySets(slot.setCount)
+    const sets = value?.sets?.length ? value.sets : previous?.sets?.length ? previous.sets : buildEmptySets(slot.setCount)
     return {
       exerciseSlotId: slot.id,
       selectedOptionName,
@@ -45,9 +52,10 @@ export function ExerciseCard({ slot, value, previous, isActive, onChange, onActi
       difficulty: value?.difficulty ?? 'good',
       notes: value?.notes ?? ''
     }
-  }, [selectedOptionName, slot.id, slot.setCount, value])
+  }, [previous?.sets, selectedOptionName, slot.id, slot.setCount, value])
   const hint = progressionHint(slot, value, previous)
   const completedCount = log.sets.filter((set) => set.weight.trim() && set.reps.trim()).length
+  const selectedTags = parseTags(log.notes)
 
   const updateLog = (next: ExerciseLog) => {
     onChange(next)
@@ -60,7 +68,24 @@ export function ExerciseCard({ slot, value, previous, isActive, onChange, onActi
 
   const updateSet = (index: number, field: 'weight' | 'reps', fieldValue: string) => {
     const sets = log.sets.map((set, setIndex) => (setIndex === index ? { ...set, [field]: fieldValue } : set))
+    if (index === 0 && fieldValue.trim()) {
+      for (let setIndex = 1; setIndex < sets.length; setIndex += 1) {
+        if (!sets[setIndex][field].trim()) sets[setIndex] = { ...sets[setIndex], [field]: fieldValue }
+      }
+    }
     updateLog({ ...log, sets })
+  }
+
+  const toggleTag = (tag: string) => {
+    const nextTags = selectedTags.includes(tag) ? selectedTags.filter((item) => item !== tag) : [...selectedTags, tag]
+    updateLog({ ...log, notes: serializeTags(nextTags) })
+  }
+
+  const addCustomTag = () => {
+    const tag = customTag.trim()
+    if (!tag) return
+    updateLog({ ...log, notes: serializeTags([...selectedTags, tag]) })
+    setCustomTag('')
   }
 
   if (!isActive) {
@@ -124,10 +149,20 @@ export function ExerciseCard({ slot, value, previous, isActive, onChange, onActi
               ))}
             </select>
           </label>
-          <label className="notes-field">
-            Notes
-            <input value={log.notes} onChange={(event) => updateLog({ ...log, notes: event.target.value })} placeholder="pain, machine taken, felt strong" />
-          </label>
+          <div className="tag-field">
+            <span>Tags</span>
+            <div className="tag-list">
+              {noteTags.map((tag) => (
+                <button key={tag} type="button" className={selectedTags.includes(tag) ? 'active' : ''} onClick={() => toggleTag(tag)}>
+                  {tag}
+                </button>
+              ))}
+            </div>
+            <div className="custom-tag-row">
+              <input value={customTag} onChange={(event) => setCustomTag(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter') addCustomTag() }} placeholder="add your own" />
+              <button type="button" onClick={addCustomTag}>Add</button>
+            </div>
+          </div>
         </div>
         <div className="current-actions">
           <button type="button" onClick={onNext}>{completedCount >= slot.setCount ? 'Next lift' : 'Skip to next'}</button>
