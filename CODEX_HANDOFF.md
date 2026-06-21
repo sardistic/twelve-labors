@@ -1,6 +1,6 @@
 # Codex Handoff
 
-You are working in a Vite React TypeScript app named Project Fitness. The app is a local-first workout planner and progression tracker for a Monday-Friday after-work gym routine. Preserve the existing data-driven architecture.
+You are working in a Vite React TypeScript app named Twelve Labors. The app is a local-first workout planner and progression tracker for a Monday-Friday after-work gym routine. Preserve the existing data-driven architecture.
 
 The current app stores workout logs in localStorage, loads a typed workout plan from `src/data/workoutPlan.ts`, renders each exercise slot with a primary/backup/fallback option tree, and calculates progression hints through `src/lib/progression.ts`.
 

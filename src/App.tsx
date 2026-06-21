@@ -195,8 +195,8 @@ function App() {
     <main className={`app-shell view-${activeView}`} data-theme={settings.theme}>
       <div className="app-titlebar">
         <div>
-          <span className="brand-mark"><img src="/project-fitness-logo.png" alt="" />Project Fitness</span>
-          <h1>Project Fitness</h1>
+          <span className="brand-mark"><img src="/twelve-labors-logo.png" alt="" />Twelve Labors</span>
+          <h1>Twelve Labors</h1>
         </div>
         <p>Planet Fitness-style machine split · M-F · 6 PM · under 60 minutes</p>
       </div>
