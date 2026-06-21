@@ -102,7 +102,7 @@ const compact = (value, max = 950) => (value.length > max ? `${value.slice(0, ma
 
 const stamp = (label) => [
   '```text',
-  'PROJECT FIT / FIELD TERMINAL',
+  'PROJECT FITNESS / FIELD TERMINAL',
   `STATUS: ${label.toUpperCase()}`,
   '```'
 ].join('\n')
@@ -154,7 +154,7 @@ const fieldManualResponse = ({ title, description, fields = [], tone = 'neutral'
       embeds: [
         {
           color: colors[tone] ?? colors.neutral,
-          author: { name: 'PROJECT FIT // WORK SET' },
+          author: { name: 'PROJECT FITNESS // WORK SET' },
           title,
           description,
           fields: fields.map((field) => ({ ...field, value: compact(String(field.value || '-')) })),
@@ -453,7 +453,7 @@ const runReminderSweep = async () => {
     const userId = file.replace('.json', '')
     const record = await readUserData(userId)
     if (record.reminderTime !== hhmm || record.lastReminderDate === today) continue
-    const sent = await sendDiscordDm(userId, `Training check-in: open Project Fit or use /today, /next, and /log right here.`)
+    const sent = await sendDiscordDm(userId, `Training check-in: open Project Fitness or use /today, /next, and /log right here.`)
     if (sent) {
       record.lastReminderDate = today
       await writeUserData(userId, record)
@@ -481,7 +481,7 @@ createServer(async (request, response) => {
     json(response, 500, { error: error instanceof Error ? error.message : 'Server error.' })
   }
 }).listen(port, () => {
-  console.log(`Project Fit server listening on ${port}`)
+  console.log(`Project Fitness server listening on ${port}`)
 })
 
 setInterval(() => {

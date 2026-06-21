@@ -92,7 +92,7 @@ button {
 
 .app-titlebar > div {
   display: grid;
-  grid-template-columns: 132px minmax(0, 1fr);
+  grid-template-columns: 176px minmax(0, 1fr);
   align-items: center;
   transform: rotate(-0.25deg);
 }
@@ -127,6 +127,21 @@ button {
   place-items: center;
   background: var(--yellow);
   border-right: 2px solid var(--line);
+}
+
+.brand-mark {
+  grid-template-columns: 44px 1fr;
+  gap: 8px;
+  padding: 8px 10px;
+  text-align: left;
+}
+
+.brand-mark img {
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  border: 2px solid var(--line);
+  background: var(--paper);
 }
 
 .app-titlebar h1,

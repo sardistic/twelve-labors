@@ -16,7 +16,7 @@
    - Railway: `https://YOUR-RAILWAY-DOMAIN/api/discord/interactions`
    - Local tunnel, if testing locally: `https://YOUR-TUNNEL-DOMAIN/api/discord/interactions`
 
-The browser sign-in requests only the `identify` scope. Discord is used for identity; Project Fit stores workout data through this app's backend. The bot uses signed interaction webhooks, so Railway receives slash commands directly.
+The browser sign-in requests only the `identify` scope. Discord is used for identity; Project Fitness stores workout data through this app's backend. The bot uses signed interaction webhooks, so Railway receives slash commands directly.
 
 ## Railway Variables
 

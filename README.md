@@ -1,4 +1,4 @@
-# Project Fit
+# Project Fitness
 
 A local-first workout planner and progression tracker built for a Monday-Friday 6 PM gym routine under 60 minutes.
 

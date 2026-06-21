@@ -18,7 +18,7 @@ const commands = [
   },
   {
     name: 'log',
-    description: 'Save a workout set to Project Fit.',
+    description: 'Save a workout set to Project Fitness.',
     options: [
       { name: 'exercise', description: 'Exercise name', type: 3, required: true },
       { name: 'weight', description: 'Weight used, such as 180 or bodyweight', type: 3, required: true },
