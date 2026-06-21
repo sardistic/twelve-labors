@@ -100,42 +100,69 @@ const titleCase = (value) => value.replace(/-/g, ' ').replace(/\b\w/g, (letter) 
 
 const compact = (value, max = 950) => (value.length > max ? `${value.slice(0, max - 3)}...` : value)
 
-const fieldManualResponse = ({ title, description, fields = [], tone = 'neutral', ephemeral = true }) => {
+const stamp = (label) => [
+  '```text',
+  'PROJECT FIT / FIELD TERMINAL',
+  `STATUS: ${label.toUpperCase()}`,
+  '```'
+].join('\n')
+
+const setBar = (done, total) => {
+  const width = Math.max(total, 3)
+  return `[${Array.from({ length: width }, (_, index) => (index < done ? '#' : '-')).join('')}] ${done}/${total}`
+}
+
+const actionRows = (mode = 'default') => [
+  {
+    type: 1,
+    components: [
+      {
+        type: 2,
+        style: mode === 'today' ? 2 : 1,
+        label: 'Today',
+        custom_id: 'project-fit:today'
+      },
+      {
+        type: 2,
+        style: mode === 'next' ? 2 : 1,
+        label: 'Next',
+        custom_id: 'project-fit:next'
+      },
+      {
+        type: 2,
+        style: 5,
+        label: 'Open Site',
+        url: siteUrl
+      }
+    ]
+  }
+]
+
+const fieldManualResponse = ({ title, description, fields = [], tone = 'neutral', mode = 'default', ephemeral = true }) => {
   const colors = {
-    neutral: 0x2f3a32,
-    success: 0x6f8f72,
-    warning: 0xb68a4c,
-    danger: 0x9f5c55
+    neutral: 0x33382f,
+    success: 0x7f946f,
+    warning: 0xb28a53,
+    danger: 0x9d6058
   }
 
   return {
     type: 4,
     data: {
       flags: ephemeral ? 64 : undefined,
+      content: stamp(title),
       embeds: [
         {
           color: colors[tone] ?? colors.neutral,
-          author: { name: 'PROJECT FIT // FIELD LOG' },
+          author: { name: 'PROJECT FIT // WORK SET' },
           title,
           description,
           fields: fields.map((field) => ({ ...field, value: compact(String(field.value || '-')) })),
-          footer: { text: 'Log the set. Keep the line moving.' },
+          footer: { text: 'quiet reps / clean records / no ceremony' },
           timestamp: new Date().toISOString()
         }
       ],
-      components: [
-        {
-          type: 1,
-          components: [
-            {
-              type: 2,
-              style: 5,
-              label: 'Open Project Fit',
-              url: siteUrl
-            }
-          ]
-        }
-      ]
+      components: actionRows(mode)
     }
   }
 }
@@ -156,16 +183,18 @@ const todayResponse = (record) => {
       fields: [
         { name: 'Date', value: log.date, inline: true },
         { name: 'Session', value: titleCase(log.dayId), inline: true }
-      ]
+      ],
+      mode: 'today'
     })
   }
 
   const fields = exercises.slice(0, 6).map((exercise) => {
     const sets = (exercise.sets ?? []).filter((set) => set.weight || set.reps)
+    const total = Math.max(exercise.sets?.length ?? 0, sets.length, 1)
     const summary = sets.length ? sets.map((set) => `${set.weight || '?'} x ${set.reps || '?'}`).join(', ') : 'no sets'
     return {
       name: exercise.selectedOptionName || exercise.exerciseSlotId,
-      value: summary,
+      value: `${setBar(sets.length, total)}\n${summary}`,
       inline: false
     }
   })
@@ -174,7 +203,8 @@ const todayResponse = (record) => {
     title: `${log.date} // ${titleCase(log.dayId)}`,
     description: `${exercises.length} lift${exercises.length === 1 ? '' : 's'} on the board.`,
     fields,
-    tone: 'success'
+    tone: 'success',
+    mode: 'today'
   })
 }
 
@@ -190,19 +220,22 @@ const nextLiftResponse = (record) => {
       fields: [
         { name: 'Set', value: String(emptyIndex + 1), inline: true },
         { name: 'Move', value: 'Fill weight and reps', inline: true }
-      ]
+      ],
+      mode: 'next'
     })
   }
   if (exercises.length) {
     return fieldManualResponse({
       title: 'Board is clear',
       description: 'Everything currently saved for today has logged sets. Add another lift with `/log` or open the site for the full plan.',
-      tone: 'success'
+      tone: 'success',
+      mode: 'next'
     })
   }
   return fieldManualResponse({
     title: 'No active lift',
-    description: 'Today has not been seeded yet. Open the site once, or start from Discord with `/log`.'
+    description: 'Today has not been seeded yet. Open the site once, or start from Discord with `/log`.',
+    mode: 'next'
   })
 }
 
@@ -301,6 +334,16 @@ const handleDiscordCommand = async (interaction) => {
   return errorResponse('Unknown command.')
 }
 
+const handleDiscordComponent = async (interaction) => {
+  const userId = interaction.member?.user?.id ?? interaction.user?.id
+  if (!userId) return errorResponse('I could not identify your Discord user.')
+
+  const record = await readUserData(userId)
+  if (interaction.data?.custom_id === 'project-fit:today') return todayResponse(record)
+  if (interaction.data?.custom_id === 'project-fit:next') return nextLiftResponse(record)
+  return errorResponse('Unknown control.')
+}
+
 const discordInteractions = async (request, response) => {
   const rawBody = await readBody(request)
   if (!verifyDiscordSignature(request, rawBody)) return json(response, 401, { error: 'Invalid request signature.' })
@@ -308,6 +351,7 @@ const discordInteractions = async (request, response) => {
   const interaction = JSON.parse(rawBody.toString('utf8'))
   if (interaction.type === 1) return json(response, 200, { type: 1 })
   if (interaction.type === 2) return json(response, 200, await handleDiscordCommand(interaction))
+  if (interaction.type === 3) return json(response, 200, await handleDiscordComponent(interaction))
   return json(response, 200, errorResponse('Unsupported Discord interaction.'))
 }
 
