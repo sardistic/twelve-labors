@@ -94,35 +94,122 @@ const getOrCreateTodayLog = (record) => {
   return log
 }
 
-const summarizeToday = (record) => {
-  const log = getOrCreateTodayLog(record)
-  const exercises = Object.values(log.exercises ?? {})
-  if (!exercises.length) return `No sets logged for ${log.date} yet. Use /log to save one.`
+const siteUrl = `https://${process.env.RAILWAY_PUBLIC_DOMAIN ?? 'gym-playbook-production.up.railway.app'}`
 
-  const lines = exercises.slice(0, 6).map((exercise) => {
-    const sets = (exercise.sets ?? []).filter((set) => set.weight || set.reps)
-    const summary = sets.length ? sets.map((set) => `${set.weight || '?'} x ${set.reps || '?'}`).join(', ') : 'no sets'
-    return `${exercise.selectedOptionName || exercise.exerciseSlotId}: ${summary}`
-  })
+const titleCase = (value) => value.replace(/-/g, ' ').replace(/\b\w/g, (letter) => letter.toUpperCase())
 
-  return [`${log.date} (${log.dayId})`, ...lines].join('\n')
+const compact = (value, max = 950) => (value.length > max ? `${value.slice(0, max - 3)}...` : value)
+
+const fieldManualResponse = ({ title, description, fields = [], tone = 'neutral', ephemeral = true }) => {
+  const colors = {
+    neutral: 0x2f3a32,
+    success: 0x6f8f72,
+    warning: 0xb68a4c,
+    danger: 0x9f5c55
+  }
+
+  return {
+    type: 4,
+    data: {
+      flags: ephemeral ? 64 : undefined,
+      embeds: [
+        {
+          color: colors[tone] ?? colors.neutral,
+          author: { name: 'PROJECT FIT // FIELD LOG' },
+          title,
+          description,
+          fields: fields.map((field) => ({ ...field, value: compact(String(field.value || '-')) })),
+          footer: { text: 'Log the set. Keep the line moving.' },
+          timestamp: new Date().toISOString()
+        }
+      ],
+      components: [
+        {
+          type: 1,
+          components: [
+            {
+              type: 2,
+              style: 5,
+              label: 'Open Project Fit',
+              url: siteUrl
+            }
+          ]
+        }
+      ]
+    }
+  }
 }
 
-const nextLift = (record) => {
+const errorResponse = (description) => fieldManualResponse({
+  title: 'Input check',
+  description,
+  tone: 'warning'
+})
+
+const todayResponse = (record) => {
+  const log = getOrCreateTodayLog(record)
+  const exercises = Object.values(log.exercises ?? {})
+  if (!exercises.length) {
+    return fieldManualResponse({
+      title: 'Today is empty',
+      description: 'No sets are logged yet. Start from Discord with `/log`, or open the site to work from the full plan.',
+      fields: [
+        { name: 'Date', value: log.date, inline: true },
+        { name: 'Session', value: titleCase(log.dayId), inline: true }
+      ]
+    })
+  }
+
+  const fields = exercises.slice(0, 6).map((exercise) => {
+    const sets = (exercise.sets ?? []).filter((set) => set.weight || set.reps)
+    const summary = sets.length ? sets.map((set) => `${set.weight || '?'} x ${set.reps || '?'}`).join(', ') : 'no sets'
+    return {
+      name: exercise.selectedOptionName || exercise.exerciseSlotId,
+      value: summary,
+      inline: false
+    }
+  })
+
+  return fieldManualResponse({
+    title: `${log.date} // ${titleCase(log.dayId)}`,
+    description: `${exercises.length} lift${exercises.length === 1 ? '' : 's'} on the board.`,
+    fields,
+    tone: 'success'
+  })
+}
+
+const nextLiftResponse = (record) => {
   const log = getOrCreateTodayLog(record)
   const exercises = Object.values(log.exercises ?? {})
   const open = exercises.find((exercise) => (exercise.sets ?? []).some((set) => !set.weight || !set.reps))
-  if (open) return `Next: ${open.selectedOptionName || open.exerciseSlotId}. Fill the first empty set.`
-  if (exercises.length) return 'Everything currently in today has logged sets. Add another lift with /log or open the site for the full plan.'
-  return 'No workout is seeded for today yet. Open the site once, or start from Discord with /log.'
+  if (open) {
+    const emptyIndex = open.sets.findIndex((set) => !set.weight || !set.reps)
+    return fieldManualResponse({
+      title: 'Next lift',
+      description: open.selectedOptionName || open.exerciseSlotId,
+      fields: [
+        { name: 'Set', value: String(emptyIndex + 1), inline: true },
+        { name: 'Move', value: 'Fill weight and reps', inline: true }
+      ]
+    })
+  }
+  if (exercises.length) {
+    return fieldManualResponse({
+      title: 'Board is clear',
+      description: 'Everything currently saved for today has logged sets. Add another lift with `/log` or open the site for the full plan.',
+      tone: 'success'
+    })
+  }
+  return fieldManualResponse({
+    title: 'No active lift',
+    description: 'Today has not been seeded yet. Open the site once, or start from Discord with `/log`.'
+  })
 }
 
 const optionValue = (interaction, name) => {
   const option = interaction.data?.options?.find((entry) => entry.name === name)
   return option?.value
 }
-
-const interactionMessage = (content) => ({ type: 4, data: { content, flags: 64 } })
 
 const verifyDiscordSignature = (request, rawBody) => {
   if (!discordPublicKey) return false
@@ -139,28 +226,36 @@ const verifyDiscordSignature = (request, rawBody) => {
 
 const handleDiscordCommand = async (interaction) => {
   const userId = interaction.member?.user?.id ?? interaction.user?.id
-  if (!userId) return interactionMessage('I could not identify your Discord user.')
+  if (!userId) return errorResponse('I could not identify your Discord user.')
 
   const command = interaction.data?.name
   const record = await readUserData(userId)
 
   if (command === 'today') {
-    return interactionMessage(summarizeToday(record))
+    return todayResponse(record)
   }
 
   if (command === 'next') {
-    return interactionMessage(nextLift(record))
+    return nextLiftResponse(record)
   }
 
   if (command === 'remind') {
     const time = String(optionValue(interaction, 'time') ?? '').trim()
-    if (!/^\d{2}:\d{2}$/.test(time)) return interactionMessage('Use 24-hour time like 17:30.')
+    if (!/^\d{2}:\d{2}$/.test(time)) return errorResponse('Use 24-hour time like `17:30`.')
     const [hours, minutes] = time.split(':').map(Number)
-    if (hours > 23 || minutes > 59) return interactionMessage('Use a real 24-hour time like 17:30.')
+    if (hours > 23 || minutes > 59) return errorResponse('Use a real 24-hour time like `17:30`.')
     record.reminderTime = time
     record.lastReminderDate = ''
     await writeUserData(userId, record)
-    return interactionMessage(`Reminder set for ${time}.`)
+    return fieldManualResponse({
+      title: 'Reminder armed',
+      description: 'A daily training check-in is set.',
+      fields: [
+        { name: 'Time', value: time, inline: true },
+        { name: 'Delivery', value: 'Discord DM', inline: true }
+      ],
+      tone: 'success'
+    })
   }
 
   if (command === 'log') {
@@ -171,7 +266,7 @@ const handleDiscordCommand = async (interaction) => {
     const notes = String(optionValue(interaction, 'notes') ?? '').trim()
 
     if (!exercise || !weight || !reps || !Number.isInteger(setNumber) || setNumber < 1 || setNumber > 12) {
-      return interactionMessage('Send exercise, weight, reps, and set number. Example: /log exercise:"Leg press" weight:180 reps:10 set:1')
+      return errorResponse('Send exercise, weight, reps, and set number. Example: `/log exercise:"Leg press" weight:180 reps:10 set:1`')
     }
 
     const log = getOrCreateTodayLog(record)
@@ -190,10 +285,20 @@ const handleDiscordCommand = async (interaction) => {
     log.exercises[slotId] = existing
 
     await writeUserData(userId, record)
-    return interactionMessage(`Saved ${exercise}, set ${setNumber}: ${weight} x ${reps}.`)
+    return fieldManualResponse({
+      title: 'Set saved',
+      description: exercise,
+      fields: [
+        { name: 'Set', value: String(setNumber), inline: true },
+        { name: 'Load', value: weight, inline: true },
+        { name: 'Reps', value: reps, inline: true },
+        ...(notes ? [{ name: 'Note', value: notes, inline: false }] : [])
+      ],
+      tone: 'success'
+    })
   }
 
-  return interactionMessage('Unknown command.')
+  return errorResponse('Unknown command.')
 }
 
 const discordInteractions = async (request, response) => {
@@ -203,7 +308,7 @@ const discordInteractions = async (request, response) => {
   const interaction = JSON.parse(rawBody.toString('utf8'))
   if (interaction.type === 1) return json(response, 200, { type: 1 })
   if (interaction.type === 2) return json(response, 200, await handleDiscordCommand(interaction))
-  return json(response, 200, interactionMessage('Unsupported Discord interaction.'))
+  return json(response, 200, errorResponse('Unsupported Discord interaction.'))
 }
 
 const exchangeDiscordCode = async (request, response) => {
