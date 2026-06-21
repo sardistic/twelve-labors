@@ -1555,27 +1555,149 @@ textarea:focus {
 }
 
 .app-shell[data-theme="dark"] {
-  color: #f5eddc;
-  --paper: #17191d;
-  --paper-deep: #20242b;
-  --paper-warm: #2d3035;
-  --tag: #3d3521;
-  --ink: #f5eddc;
-  --muted: #c9bcaa;
-  --faint: #8f8375;
-  --line: #f5eddc;
-  --blue: #5a89d6;
-  --red: #f06a55;
-  --yellow: #e6bf49;
-  --green: #58a879;
-  --shadow: 3px 3px 0 #f5eddc;
+  color: #e9e1d2;
+  --paper: #171819;
+  --paper-deep: #202225;
+  --paper-warm: #2a2a27;
+  --tag: #312b1b;
+  --ink: #ede5d6;
+  --muted: #b6aa97;
+  --faint: #746d61;
+  --line: #575146;
+  --blue: #7f9fc7;
+  --red: #c46a56;
+  --yellow: #caa85a;
+  --green: #78916f;
+  --shadow: 3px 3px 0 #08090b;
 }
 
 html:has(.app-shell[data-theme="dark"]) {
-  background-color: #101114;
+  background-color: #0d0e0f;
   background-image:
-    linear-gradient(rgba(245, 237, 220, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(245, 237, 220, 0.035) 1px, transparent 1px);
+    linear-gradient(rgba(237, 229, 214, 0.028) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(237, 229, 214, 0.028) 1px, transparent 1px);
+}
+
+.app-shell[data-theme="dark"]::before {
+  background:
+    radial-gradient(circle, #151515 0 5px, transparent 5.5px) center 58px / 100% 96px repeat-y,
+    #7a3b31;
+}
+
+.app-shell[data-theme="dark"] .app-titlebar > div,
+.app-shell[data-theme="dark"] .app-titlebar > p,
+.app-shell[data-theme="dark"] .page-sheet,
+.app-shell[data-theme="dark"] .day-tabs,
+.app-shell[data-theme="dark"] .hero-card,
+.app-shell[data-theme="dark"] .brief-card,
+.app-shell[data-theme="dark"] .exercise-card,
+.app-shell[data-theme="dark"] .timer-card,
+.app-shell[data-theme="dark"] .progression-panel,
+.app-shell[data-theme="dark"] .sync-panel,
+.app-shell[data-theme="dark"] .session-notes,
+.app-shell[data-theme="dark"] .section-heading,
+.app-shell[data-theme="dark"] .plan-day,
+.app-shell[data-theme="dark"] .metric-grid article,
+.app-shell[data-theme="dark"] .history-table,
+.app-shell[data-theme="dark"] .settings-layout,
+.app-shell[data-theme="dark"] .history-drawer {
+  border-color: #4b463d;
+  box-shadow: 4px 4px 0 #050607;
+}
+
+.app-shell[data-theme="dark"] .page-sheet {
+  background:
+    linear-gradient(90deg, rgba(196, 106, 86, 0.22) 0 2px, transparent 2px) 58px 0 / 100% 100% no-repeat,
+    repeating-linear-gradient(0deg, transparent 0 35px, rgba(127, 159, 199, 0.075) 35px 36px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.018), transparent 220px),
+    var(--paper);
+}
+
+.app-shell[data-theme="dark"] .page-sheet::before,
+.app-shell[data-theme="dark"] .page-sheet::after {
+  background: #0d0e0f;
+}
+
+.app-shell[data-theme="dark"] .page-ruler {
+  background: #0f1011;
+  color: #d7cbb7;
+}
+
+.app-shell[data-theme="dark"] .app-titlebar span,
+.app-shell[data-theme="dark"] .day-tab span,
+.app-shell[data-theme="dark"] .progression-hint::before,
+.app-shell[data-theme="dark"] .muscle-pill,
+.app-shell[data-theme="dark"] .brief-card[open] summary::after,
+.app-shell[data-theme="dark"] .instruction-panel[open] summary::after,
+.app-shell[data-theme="dark"] .movement-picker[open] summary::after,
+.app-shell[data-theme="dark"] .plan-day[open] summary::after {
+  background: #b9974f;
+  color: #111111;
+}
+
+.app-shell[data-theme="dark"] .app-titlebar p,
+.app-shell[data-theme="dark"] .brief-card:nth-child(3)::before,
+.app-shell[data-theme="dark"] .option-button.active,
+.app-shell[data-theme="dark"] .discord-button,
+.app-shell[data-theme="dark"] .current-actions button,
+.app-shell[data-theme="dark"] .theme-switch button {
+  background: #3b5d7d;
+  color: #f2eadb;
+}
+
+.app-shell[data-theme="dark"] .app-nav button {
+  background: #312b1b;
+  color: #e9e1d2;
+}
+
+.app-shell[data-theme="dark"] .app-nav button:nth-child(2) {
+  background: #26394b;
+}
+
+.app-shell[data-theme="dark"] .app-nav button:nth-child(3) {
+  background: #283829;
+}
+
+.app-shell[data-theme="dark"] .app-nav button:nth-child(4) {
+  background: #493129;
+}
+
+.app-shell[data-theme="dark"] .app-nav button.active {
+  background: #1f2021;
+}
+
+.app-shell[data-theme="dark"] .day-tab.active {
+  background:
+    repeating-linear-gradient(-45deg, rgba(237, 229, 214, 0.07) 0 7px, transparent 7px 14px),
+    #6e5a2c;
+}
+
+.app-shell[data-theme="dark"] .next-action,
+.app-shell[data-theme="dark"] .log-banner,
+.app-shell[data-theme="dark"] .brief-card:nth-child(2)::before {
+  background: #3f5e45;
+  color: #f2eadb;
+}
+
+.app-shell[data-theme="dark"] .brief-card:nth-child(1)::before {
+  background: #8f7033;
+}
+
+.app-shell[data-theme="dark"] .exercise-topline::before {
+  background:
+    repeating-linear-gradient(0deg, #26211f 0 2px, transparent 2px 12px),
+    #804335;
+}
+
+.app-shell[data-theme="dark"] .movement-picker,
+.app-shell[data-theme="dark"] .option-button:not(.active),
+.app-shell[data-theme="dark"] .instruction-panel,
+.app-shell[data-theme="dark"] .previous-box,
+.app-shell[data-theme="dark"] .set-box,
+.app-shell[data-theme="dark"] .exercise-log-footer label,
+.app-shell[data-theme="dark"] .current-actions,
+.app-shell[data-theme="dark"] .target-box {
+  background: #202225;
 }
 
 .app-shell[data-theme="dark"] input,
@@ -1588,8 +1710,50 @@ html:has(.app-shell[data-theme="dark"]) {
 .app-shell[data-theme="dark"] .collapsed-exercise-button,
 .app-shell[data-theme="dark"] .theme-switch button,
 .app-shell[data-theme="dark"] .current-actions button:last-child {
-  background: #111318;
+  background: #101113;
   color: var(--ink);
+  border-color: #5f584c;
+  box-shadow: inset 0 -3px 0 rgba(202, 168, 90, 0.32);
+}
+
+.app-shell[data-theme="dark"] input[type="date"] {
+  color-scheme: dark;
+}
+
+.app-shell[data-theme="dark"] input:focus,
+.app-shell[data-theme="dark"] select:focus,
+.app-shell[data-theme="dark"] textarea:focus {
+  background: #15171a;
+  box-shadow: 0 0 0 3px rgba(202, 168, 90, 0.72);
+}
+
+.app-shell[data-theme="dark"] .brief-card summary::after,
+.app-shell[data-theme="dark"] .instruction-panel summary::after,
+.app-shell[data-theme="dark"] .movement-picker summary::after,
+.app-shell[data-theme="dark"] .plan-day summary::after,
+.app-shell[data-theme="dark"] .current-actions button:last-child {
+  background: #151617;
+  color: #e9e1d2;
+}
+
+.app-shell[data-theme="dark"] .progression-hint.positive {
+  background: color-mix(in srgb, var(--green) 24%, var(--paper));
+}
+
+.app-shell[data-theme="dark"] .progression-hint.warning {
+  background: color-mix(in srgb, var(--red) 22%, var(--paper));
+}
+
+.app-shell[data-theme="dark"] .set-box span::before {
+  background: #101113;
+}
+
+.app-shell[data-theme="dark"] .link-button {
+  color: #f2eadb;
+}
+
+.app-shell[data-theme="dark"] ::placeholder {
+  color: #82796b;
 }
 
 @media (max-width: 1180px) {
