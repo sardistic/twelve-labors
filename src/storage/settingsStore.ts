@@ -1,9 +1,10 @@
-import type { Goal, ThemeMode, TrainingSettings } from '../types'
+import type { BodyProfile, Goal, ThemeMode, TrainingSettings } from '../types'
 
 const settingsKey = 'project-fit.settings.v1'
 
 export const defaultSettings: TrainingSettings = {
   goal: 'recomp',
+  bodyProfile: 'balanced',
   theme: 'light',
   rampWeeks: 2,
   normalWeeks: 4,
@@ -13,6 +14,7 @@ export const defaultSettings: TrainingSettings = {
 }
 
 const goals: Goal[] = ['recomp', 'fat-loss', 'muscle-gain', 'strength']
+const bodyProfiles: BodyProfile[] = ['lean', 'balanced', 'larger', 'returning']
 const themes: ThemeMode[] = ['light', 'dark']
 
 const numberInRange = (value: unknown, fallback: number, min: number, max: number) => {
@@ -26,6 +28,7 @@ export const normalizeSettings = (value: unknown): TrainingSettings => {
   const candidate = value as Partial<TrainingSettings>
   return {
     goal: candidate.goal && goals.includes(candidate.goal) ? candidate.goal : defaultSettings.goal,
+    bodyProfile: candidate.bodyProfile && bodyProfiles.includes(candidate.bodyProfile) ? candidate.bodyProfile : defaultSettings.bodyProfile,
     theme: candidate.theme && themes.includes(candidate.theme) ? candidate.theme : defaultSettings.theme,
     rampWeeks: numberInRange(candidate.rampWeeks, defaultSettings.rampWeeks, 0, 12),
     normalWeeks: numberInRange(candidate.normalWeeks, defaultSettings.normalWeeks, 1, 20),

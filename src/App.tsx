@@ -156,7 +156,7 @@ function App() {
             onEnergyChange={(value) => updateSessionField('energy', value)}
           />
 
-          <WorkoutBrief day={day} />
+          <WorkoutBrief day={day} settings={settings} />
 
           <section className="exercise-stack">
             {day.exercises.map((slot) => (

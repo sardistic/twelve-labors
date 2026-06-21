@@ -1,4 +1,5 @@
-import type { Goal, TrainingSettings } from '../types'
+import { bodyProfileLabels } from '../lib/trainingGuidance'
+import type { BodyProfile, Goal, TrainingSettings } from '../types'
 
 type Props = {
   settings: TrainingSettings
@@ -12,6 +13,13 @@ const goalOptions: Array<{ id: Goal; label: string; detail: string }> = [
   { id: 'strength', label: 'Strength', detail: 'Favor repeatable heavy sets and longer rest windows.' }
 ]
 
+const bodyOptions: Array<{ id: BodyProfile; detail: string }> = [
+  { id: 'lean', detail: 'Smaller jumps, recovery and nutrition matter most.' },
+  { id: 'balanced', detail: 'Run the plan close to written.' },
+  { id: 'larger', detail: 'Stable machines, joint comfort, repeatable volume.' },
+  { id: 'returning', detail: 'Conservative effort while the habit locks in.' }
+]
+
 export function SettingsView({ settings, onChange }: Props) {
   const update = <Key extends keyof TrainingSettings>(key: Key, value: TrainingSettings[Key]) => onChange({ ...settings, [key]: value })
 
@@ -21,13 +29,27 @@ export function SettingsView({ settings, onChange }: Props) {
         <span>Preferences</span>
         <h2>Settings</h2>
       </div>
-      <div className="goal-grid">
-        {goalOptions.map((goal) => (
-          <button key={goal.id} type="button" className={settings.goal === goal.id ? 'active' : ''} onClick={() => update('goal', goal.id)}>
-            <strong>{goal.label}</strong>
-            <span>{goal.detail}</span>
-          </button>
-        ))}
+      <div className="profile-block">
+        <span>Body profile</span>
+        <div className="body-grid">
+          {bodyOptions.map((profile) => (
+            <button key={profile.id} type="button" className={settings.bodyProfile === profile.id ? 'active' : ''} onClick={() => update('bodyProfile', profile.id)}>
+              <strong>{bodyProfileLabels[profile.id]}</strong>
+              <span>{profile.detail}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="profile-block">
+        <span>Workout aim</span>
+        <div className="goal-grid">
+          {goalOptions.map((goal) => (
+            <button key={goal.id} type="button" className={settings.goal === goal.id ? 'active' : ''} onClick={() => update('goal', goal.id)}>
+              <strong>{goal.label}</strong>
+              <span>{goal.detail}</span>
+            </button>
+          ))}
+        </div>
       </div>
       <div className="theme-switch">
         <span>Display</span>

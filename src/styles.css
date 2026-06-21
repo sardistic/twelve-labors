@@ -52,9 +52,9 @@ button {
 
 .app-shell {
   position: relative;
-  width: min(1580px, calc(100vw - 32px));
+  width: min(1420px, calc(100vw - 32px));
   margin: 0 auto;
-  padding: 22px 0 72px 34px;
+  padding: 18px 0 72px 20px;
 }
 
 .app-shell::before {
@@ -62,12 +62,12 @@ button {
   position: fixed;
   top: 0;
   bottom: 0;
-  left: max(8px, calc((100vw - 1580px) / 2 + 8px));
-  width: 24px;
+  left: max(8px, calc((100vw - 1420px) / 2 + 8px));
+  width: 14px;
   border-left: 2px solid var(--line);
   border-right: 2px solid var(--line);
   background:
-    radial-gradient(circle, var(--line) 0 5px, transparent 5.5px) center 58px / 100% 96px repeat-y,
+    radial-gradient(circle, var(--line) 0 3px, transparent 3.5px) center 58px / 100% 96px repeat-y,
     var(--red);
   pointer-events: none;
   z-index: 0;
@@ -77,10 +77,10 @@ button {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr);
   align-items: stretch;
   gap: 12px;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .app-titlebar > div,
@@ -92,7 +92,7 @@ button {
 
 .app-titlebar > div {
   display: grid;
-  grid-template-columns: 168px minmax(0, 1fr);
+  grid-template-columns: 132px minmax(0, 1fr);
   align-items: center;
   transform: rotate(-0.25deg);
 }
@@ -139,12 +139,12 @@ button {
 }
 
 .app-titlebar h1 {
-  padding: 18px 18px 14px;
-  font-size: clamp(2.4rem, 5.8vw, 6.8rem);
+  padding: 12px 16px 10px;
+  font-size: clamp(2.2rem, 5vw, 5.2rem);
 }
 
 .app-titlebar p {
-  display: grid;
+  display: none;
   align-items: center;
   max-width: 440px;
   margin: 0;
@@ -161,10 +161,10 @@ button {
   position: relative;
   z-index: 2;
   display: grid;
-  grid-template-columns: repeat(4, minmax(120px, 1fr));
-  gap: 8px;
-  width: min(850px, 100%);
-  margin: 0 0 -2px 18px;
+  grid-template-columns: repeat(4, minmax(104px, 1fr));
+  gap: 5px;
+  width: min(680px, 100%);
+  margin: 0 0 -2px 10px;
   border: 0;
   background: transparent;
   box-shadow: none;
@@ -172,7 +172,7 @@ button {
 
 .app-nav button {
   position: relative;
-  min-height: 48px;
+  min-height: 40px;
   border: 2px solid var(--line);
   border-bottom: 0;
   background: var(--tag);
@@ -201,7 +201,7 @@ button {
 }
 
 .app-nav button.active {
-  min-height: 56px;
+  min-height: 46px;
   background: var(--paper);
   color: var(--ink);
   z-index: 3;
@@ -211,13 +211,13 @@ button {
 .page-sheet {
   position: relative;
   z-index: 1;
-  padding: 42px 22px 22px;
+  padding: 36px 16px 18px;
   border: 2px solid var(--line);
   background:
     linear-gradient(90deg, rgba(214, 68, 47, 0.14) 0 2px, transparent 2px) 58px 0 / 100% 100% no-repeat,
     repeating-linear-gradient(0deg, transparent 0 35px, rgba(36, 89, 166, 0.08) 35px 36px),
     var(--paper);
-  box-shadow: 5px 5px 0 var(--line);
+  box-shadow: 3px 3px 0 var(--line);
 }
 
 .page-sheet::before,
@@ -243,7 +243,7 @@ button {
 .page-ruler {
   position: absolute;
   inset: 0 0 auto;
-  min-height: 30px;
+  min-height: 26px;
   display: grid;
   grid-template-columns: 120px 120px minmax(0, 1fr);
   border-bottom: 2px solid var(--line);
@@ -279,13 +279,13 @@ button {
 }
 
 .day-tab {
-  min-height: 76px;
+  min-height: 58px;
   border: 0;
   border-right: 2px solid var(--line);
   background: var(--paper);
   color: var(--ink);
   border-radius: 0;
-  padding: 12px;
+  padding: 10px;
   text-align: left;
 }
 
@@ -318,7 +318,7 @@ button {
 
 .layout-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 360px;
+  grid-template-columns: minmax(0, 1fr) 300px;
   gap: 12px;
   align-items: start;
 }
@@ -353,7 +353,7 @@ button {
   border: 2px solid var(--line);
   background: var(--paper);
   border-radius: var(--radius);
-  box-shadow: var(--shadow);
+  box-shadow: 2px 2px 0 var(--line);
 }
 
 .hero-card,
@@ -370,14 +370,14 @@ button {
 
 .hero-card {
   display: grid;
-  grid-template-columns: minmax(240px, 1fr) minmax(420px, auto);
+  grid-template-columns: minmax(240px, 1fr) minmax(360px, auto);
   gap: 0;
   padding: 0;
   align-items: stretch;
 }
 
 .workout-title-block {
-  padding: 14px 16px 12px;
+  padding: 12px 14px 10px;
   border-right: 2px solid var(--line);
 }
 
@@ -387,14 +387,14 @@ button {
 
 .hero-card h1 {
   margin-top: 5px;
-  font-size: clamp(1.7rem, 3.1vw, 3.4rem);
+  font-size: clamp(1.55rem, 2.6vw, 2.7rem);
 }
 
 .hero-focus {
   max-width: 720px;
   margin: 6px 0 0;
   color: var(--muted);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   line-height: 1.25;
 }
 
@@ -414,7 +414,7 @@ button {
 
 .header-fields {
   display: grid;
-  grid-template-columns: 150px 132px 132px;
+  grid-template-columns: 136px 116px 116px;
   gap: 0;
   min-width: 0;
   align-self: stretch;
@@ -441,8 +441,8 @@ button {
 
 .header-fields input,
 .header-fields select {
-  min-height: 34px;
-  padding: 6px 8px;
+  min-height: 32px;
+  padding: 5px 7px;
   border-width: 2px;
   font-size: 0.92rem;
   box-shadow: inset 0 -2px 0 rgba(242, 201, 76, 0.65);
@@ -492,7 +492,7 @@ textarea:focus {
 
 .brief-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr 1.4fr;
+  grid-template-columns: 1.35fr 0.8fr 1fr;
   gap: 12px;
 }
 
@@ -506,7 +506,7 @@ textarea:focus {
 .metric-grid article,
 .history-table,
 .settings-layout {
-  padding: 16px;
+  padding: 14px;
 }
 
 .brief-card,
@@ -569,7 +569,7 @@ textarea:focus {
   content: "";
   display: block;
   height: 8px;
-  margin: -16px -16px 14px;
+  margin: -14px -14px 12px;
   border-bottom: 2px solid var(--line);
   background: var(--paper-warm);
 }
@@ -602,6 +602,18 @@ textarea:focus {
   margin: 10px 0 0;
   color: var(--ink);
   line-height: 1.48;
+}
+
+.training-guide-card {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+}
+
+.training-guide-card strong {
+  max-width: 62ch;
+  font-size: 0.98rem;
+  line-height: 1.42;
 }
 
 .brief-card:not([open]) {
@@ -666,7 +678,7 @@ textarea:focus {
 .exercise-topline h2 {
   margin: 8px 0 5px;
   color: var(--ink);
-  font-size: 2rem;
+  font-size: 1.72rem;
   line-height: 0.98;
   letter-spacing: 0;
   text-transform: uppercase;
@@ -999,12 +1011,12 @@ textarea:focus {
 .timer-card,
 .progression-panel,
 .sync-panel {
-  padding: 16px;
+  padding: 14px;
 }
 
 .timer-card {
   display: grid;
-  gap: 16px;
+  gap: 12px;
 }
 
 .sync-panel {
@@ -1014,7 +1026,7 @@ textarea:focus {
 
 .sync-panel h2 {
   margin: 0;
-  font-size: 1.35rem;
+  font-size: 1.1rem;
   text-transform: uppercase;
 }
 
@@ -1073,7 +1085,7 @@ textarea:focus {
 .timer-card strong {
   display: block;
   font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
-  font-size: 3.2rem;
+  font-size: 2.35rem;
   line-height: 1;
   letter-spacing: 0;
   margin-top: 8px;
@@ -1107,12 +1119,12 @@ textarea:focus {
   border: 2px solid var(--line);
   background: #fffaf0;
   color: var(--ink);
-  padding: 10px 12px;
+  padding: 9px 10px;
   border-radius: 0;
   font-weight: 900;
   text-align: center;
   text-transform: uppercase;
-  box-shadow: 3px 3px 0 var(--line);
+  box-shadow: 2px 2px 0 var(--line);
 }
 
 .timer-actions button:first-child,
@@ -1123,14 +1135,14 @@ textarea:focus {
 
 .progression-panel h2 {
   margin: 0;
-  font-size: 1.4rem;
+  font-size: 1.14rem;
   text-transform: uppercase;
 }
 
 .rule-stack {
   display: grid;
   gap: 0;
-  margin-top: 14px;
+  margin-top: 10px;
   border: 2px solid var(--line);
   border-bottom: 0;
 }
@@ -1148,13 +1160,13 @@ textarea:focus {
 }
 
 .stats-box {
-  margin-top: 12px;
+  margin-top: 10px;
   border: 2px solid var(--line);
   background: #fffaf0;
 }
 
 .data-actions {
-  margin-top: 14px;
+  margin-top: 10px;
 }
 
 .import-button input {
@@ -1290,7 +1302,8 @@ textarea:focus {
 
 .plan-exercise-list button,
 .history-table button,
-.goal-grid button {
+.goal-grid button,
+.body-grid button {
   display: grid;
   gap: 6px;
   width: 100%;
@@ -1311,6 +1324,7 @@ textarea:focus {
 .plan-exercise-list button:hover,
 .history-table button:hover,
 .goal-grid button:hover,
+.body-grid button:hover,
 .timer-actions button:hover,
 .data-actions button:hover,
 .open-day-button:hover {
@@ -1319,7 +1333,8 @@ textarea:focus {
 }
 
 .plan-exercise-list span,
-.goal-grid span {
+.goal-grid span,
+.body-grid span {
   color: var(--muted);
   line-height: 1.35;
 }
@@ -1403,20 +1418,42 @@ textarea:focus {
   color: #fff8e8;
 }
 
-.goal-grid {
+.profile-block {
+  display: grid;
+  gap: 8px;
+}
+
+.profile-block > span {
+  color: var(--ink);
+  text-transform: uppercase;
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  font-weight: 900;
+}
+
+.goal-grid,
+.body-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 8px;
 }
 
-.goal-grid button.active {
+.body-grid button,
+.goal-grid button {
+  min-height: 112px;
+}
+
+.goal-grid button.active,
+.body-grid button.active {
   background:
     repeating-linear-gradient(-45deg, rgba(255, 248, 232, 0.12) 0 7px, transparent 7px 14px),
     var(--red);
   color: #fff8e8;
 }
 
-.goal-grid button.active span {
+.goal-grid button.active span,
+.body-grid button.active span {
   color: #fff8e8;
 }
 
@@ -1901,6 +1938,7 @@ html:has(.app-shell[data-theme="dark"]) {
   .plan-grid,
   .metric-grid,
   .goal-grid,
+  .body-grid,
   .settings-grid {
     grid-template-columns: 1fr;
   }

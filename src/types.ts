@@ -69,8 +69,11 @@ export type Goal = 'recomp' | 'fat-loss' | 'muscle-gain' | 'strength'
 
 export type ThemeMode = 'light' | 'dark'
 
+export type BodyProfile = 'lean' | 'balanced' | 'larger' | 'returning'
+
 export type TrainingSettings = {
   goal: Goal
+  bodyProfile: BodyProfile
   theme: ThemeMode
   rampWeeks: number
   normalWeeks: number
