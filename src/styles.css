@@ -92,7 +92,7 @@ button {
 
 .app-titlebar > div {
   display: grid;
-  grid-template-columns: 176px minmax(0, 1fr);
+  grid-template-columns: 136px minmax(0, 1fr);
   align-items: center;
   transform: rotate(-0.25deg);
 }
@@ -130,15 +130,12 @@ button {
 }
 
 .brand-mark {
-  grid-template-columns: 44px 1fr;
-  gap: 8px;
-  padding: 8px 10px;
-  text-align: left;
+  padding: 8px;
 }
 
 .brand-mark img {
-  width: 44px;
-  height: 44px;
+  width: min(100%, 96px);
+  height: 76px;
   object-fit: cover;
   border: 2px solid var(--line);
   background: var(--paper);
