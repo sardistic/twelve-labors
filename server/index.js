@@ -1,15 +1,19 @@
 import { createHmac, randomBytes, timingSafeEqual } from 'node:crypto'
 import { existsSync } from 'node:fs'
-import { mkdir, readFile, writeFile } from 'node:fs/promises'
+import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises'
 import { createServer } from 'node:http'
 import { extname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import nacl from 'tweetnacl'
 
 const root = resolve(fileURLToPath(new URL('..', import.meta.url)))
 const distDir = join(root, 'dist')
 const dataDir = resolve(process.env.DATA_DIR ?? join(root, 'data'))
 const port = Number(process.env.PORT ?? 3000)
 const sessionSecret = process.env.SESSION_SECRET ?? 'dev-session-secret-change-me'
+const discordPublicKey = process.env.DISCORD_PUBLIC_KEY ?? ''
+const discordBotToken = process.env.DISCORD_BOT_TOKEN ?? ''
+const weekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday']
 
 const json = (response, status, body) => {
   response.writeHead(status, { 'Content-Type': 'application/json' })
@@ -19,7 +23,7 @@ const json = (response, status, body) => {
 const readBody = async (request) => {
   const chunks = []
   for await (const chunk of request) chunks.push(chunk)
-  return Buffer.concat(chunks).toString('utf8')
+  return Buffer.concat(chunks)
 }
 
 const base64url = (value) => Buffer.from(value).toString('base64url')
@@ -47,8 +51,163 @@ const verifyToken = (token = '') => {
 
 const userPath = (userId) => join(dataDir, `${userId.replace(/[^0-9]/g, '')}.json`)
 
+const readJsonBody = async (request) => JSON.parse((await readBody(request)).toString('utf8'))
+
+const todayISO = () => new Date().toISOString().slice(0, 10)
+
+const weekdayFromDate = (date) => {
+  const day = new Date(`${date}T12:00:00`).getDay()
+  if (day >= 1 && day <= 5) return weekdays[day - 1]
+  return 'monday'
+}
+
+const makeLogId = (date, dayId) => `${date}:${dayId}`
+
+const slugify = (value) => value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'exercise'
+
+const emptyRecord = () => ({ logs: [], settings: null, savedAt: '' })
+
+const readUserData = async (userId) => {
+  const path = userPath(userId)
+  if (!existsSync(path)) return emptyRecord()
+  return { ...emptyRecord(), ...JSON.parse(await readFile(path, 'utf8')) }
+}
+
+const writeUserData = async (userId, record) => {
+  await mkdir(dataDir, { recursive: true })
+  const savedAt = new Date().toISOString()
+  await writeFile(userPath(userId), JSON.stringify({ ...record, savedAt }, null, 2))
+  return savedAt
+}
+
+const getOrCreateTodayLog = (record) => {
+  const date = todayISO()
+  const dayId = weekdayFromDate(date)
+  const id = makeLogId(date, dayId)
+  const logs = Array.isArray(record.logs) ? record.logs : []
+  let log = logs.find((entry) => entry.id === id)
+  if (!log) {
+    log = { id, date, dayId, bodyWeight: '', energy: 'normal', exercises: {}, cardio: '', notes: '' }
+    logs.push(log)
+    record.logs = logs
+  }
+  return log
+}
+
+const summarizeToday = (record) => {
+  const log = getOrCreateTodayLog(record)
+  const exercises = Object.values(log.exercises ?? {})
+  if (!exercises.length) return `No sets logged for ${log.date} yet. Use /log to save one.`
+
+  const lines = exercises.slice(0, 6).map((exercise) => {
+    const sets = (exercise.sets ?? []).filter((set) => set.weight || set.reps)
+    const summary = sets.length ? sets.map((set) => `${set.weight || '?'} x ${set.reps || '?'}`).join(', ') : 'no sets'
+    return `${exercise.selectedOptionName || exercise.exerciseSlotId}: ${summary}`
+  })
+
+  return [`${log.date} (${log.dayId})`, ...lines].join('\n')
+}
+
+const nextLift = (record) => {
+  const log = getOrCreateTodayLog(record)
+  const exercises = Object.values(log.exercises ?? {})
+  const open = exercises.find((exercise) => (exercise.sets ?? []).some((set) => !set.weight || !set.reps))
+  if (open) return `Next: ${open.selectedOptionName || open.exerciseSlotId}. Fill the first empty set.`
+  if (exercises.length) return 'Everything currently in today has logged sets. Add another lift with /log or open the site for the full plan.'
+  return 'No workout is seeded for today yet. Open the site once, or start from Discord with /log.'
+}
+
+const optionValue = (interaction, name) => {
+  const option = interaction.data?.options?.find((entry) => entry.name === name)
+  return option?.value
+}
+
+const interactionMessage = (content) => ({ type: 4, data: { content, flags: 64 } })
+
+const verifyDiscordSignature = (request, rawBody) => {
+  if (!discordPublicKey) return false
+  const signature = request.headers['x-signature-ed25519']
+  const timestamp = request.headers['x-signature-timestamp']
+  if (!signature || !timestamp) return false
+
+  return nacl.sign.detached.verify(
+    Buffer.from(`${timestamp}${rawBody.toString('utf8')}`),
+    Buffer.from(signature, 'hex'),
+    Buffer.from(discordPublicKey, 'hex')
+  )
+}
+
+const handleDiscordCommand = async (interaction) => {
+  const userId = interaction.member?.user?.id ?? interaction.user?.id
+  if (!userId) return interactionMessage('I could not identify your Discord user.')
+
+  const command = interaction.data?.name
+  const record = await readUserData(userId)
+
+  if (command === 'today') {
+    return interactionMessage(summarizeToday(record))
+  }
+
+  if (command === 'next') {
+    return interactionMessage(nextLift(record))
+  }
+
+  if (command === 'remind') {
+    const time = String(optionValue(interaction, 'time') ?? '').trim()
+    if (!/^\d{2}:\d{2}$/.test(time)) return interactionMessage('Use 24-hour time like 17:30.')
+    const [hours, minutes] = time.split(':').map(Number)
+    if (hours > 23 || minutes > 59) return interactionMessage('Use a real 24-hour time like 17:30.')
+    record.reminderTime = time
+    record.lastReminderDate = ''
+    await writeUserData(userId, record)
+    return interactionMessage(`Reminder set for ${time}.`)
+  }
+
+  if (command === 'log') {
+    const exercise = String(optionValue(interaction, 'exercise') ?? '').trim()
+    const weight = String(optionValue(interaction, 'weight') ?? '').trim()
+    const reps = String(optionValue(interaction, 'reps') ?? '').trim()
+    const setNumber = Number(optionValue(interaction, 'set') ?? 1)
+    const notes = String(optionValue(interaction, 'notes') ?? '').trim()
+
+    if (!exercise || !weight || !reps || !Number.isInteger(setNumber) || setNumber < 1 || setNumber > 12) {
+      return interactionMessage('Send exercise, weight, reps, and set number. Example: /log exercise:"Leg press" weight:180 reps:10 set:1')
+    }
+
+    const log = getOrCreateTodayLog(record)
+    const slotId = slugify(exercise)
+    const existing = log.exercises[slotId] ?? {
+      exerciseSlotId: slotId,
+      selectedOptionName: exercise,
+      sets: [],
+      difficulty: 'good',
+      notes: ''
+    }
+
+    while (existing.sets.length < setNumber) existing.sets.push({ weight: '', reps: '' })
+    existing.sets[setNumber - 1] = { weight, reps }
+    existing.notes = [existing.notes, notes].filter(Boolean).join(' | ')
+    log.exercises[slotId] = existing
+
+    await writeUserData(userId, record)
+    return interactionMessage(`Saved ${exercise}, set ${setNumber}: ${weight} x ${reps}.`)
+  }
+
+  return interactionMessage('Unknown command.')
+}
+
+const discordInteractions = async (request, response) => {
+  const rawBody = await readBody(request)
+  if (!verifyDiscordSignature(request, rawBody)) return json(response, 401, { error: 'Invalid request signature.' })
+
+  const interaction = JSON.parse(rawBody.toString('utf8'))
+  if (interaction.type === 1) return json(response, 200, { type: 1 })
+  if (interaction.type === 2) return json(response, 200, await handleDiscordCommand(interaction))
+  return json(response, 200, interactionMessage('Unsupported Discord interaction.'))
+}
+
 const exchangeDiscordCode = async (request, response) => {
-  const { code, redirectUri } = JSON.parse(await readBody(request))
+  const { code, redirectUri } = await readJsonBody(request)
   const clientId = process.env.DISCORD_CLIENT_ID
   const clientSecret = process.env.DISCORD_CLIENT_SECRET
   const configuredRedirectUri = process.env.DISCORD_REDIRECT_URI ?? redirectUri
@@ -63,12 +222,11 @@ const exchangeDiscordCode = async (request, response) => {
 
   const tokenResponse = await fetch('https://discord.com/api/oauth2/token', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: tokenBody,
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
       Authorization: `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`
-    }
+    },
+    body: tokenBody
   })
 
   if (!tokenResponse.ok) return json(response, 401, { error: 'Discord token exchange failed.' })
@@ -98,17 +256,60 @@ const syncLogs = async (request, response) => {
   if (!userId) return json(response, 401, { error: 'Not signed in.' })
 
   await mkdir(dataDir, { recursive: true })
-  const path = userPath(userId)
 
   if (request.method === 'GET') {
-    if (!existsSync(path)) return json(response, 200, { logs: [], settings: null, savedAt: '' })
-    return json(response, 200, JSON.parse(await readFile(path, 'utf8')))
+    return json(response, 200, await readUserData(userId))
   }
 
-  const payload = JSON.parse(await readBody(request))
-  const savedAt = new Date().toISOString()
-  await writeFile(path, JSON.stringify({ ...payload, savedAt }, null, 2))
+  const payload = await readJsonBody(request)
+  const existing = await readUserData(userId)
+  const savedAt = await writeUserData(userId, {
+    ...existing,
+    logs: payload.logs ?? [],
+    settings: payload.settings ?? null
+  })
   json(response, 200, { savedAt })
+}
+
+const sendDiscordDm = async (userId, content) => {
+  if (!discordBotToken) return false
+  const channelResponse = await fetch('https://discord.com/api/v10/users/@me/channels', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bot ${discordBotToken}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ recipient_id: userId })
+  })
+  if (!channelResponse.ok) return false
+  const channel = await channelResponse.json()
+  const messageResponse = await fetch(`https://discord.com/api/v10/channels/${channel.id}/messages`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bot ${discordBotToken}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ content })
+  })
+  return messageResponse.ok
+}
+
+const runReminderSweep = async () => {
+  if (!discordBotToken || !existsSync(dataDir)) return
+  const now = new Date()
+  const hhmm = now.toTimeString().slice(0, 5)
+  const today = todayISO()
+  for (const file of await readdir(dataDir)) {
+    if (!/^\d+\.json$/.test(file)) continue
+    const userId = file.replace('.json', '')
+    const record = await readUserData(userId)
+    if (record.reminderTime !== hhmm || record.lastReminderDate === today) continue
+    const sent = await sendDiscordDm(userId, `Training check-in: open Project Fit or use /today, /next, and /log right here.`)
+    if (sent) {
+      record.lastReminderDate = today
+      await writeUserData(userId, record)
+    }
+  }
 }
 
 const serveStatic = async (request, response) => {
@@ -123,6 +324,7 @@ const serveStatic = async (request, response) => {
 
 createServer(async (request, response) => {
   try {
+    if (request.url === '/api/discord/interactions' && request.method === 'POST') return await discordInteractions(request, response)
     if (request.url === '/api/auth/discord/exchange' && request.method === 'POST') return await exchangeDiscordCode(request, response)
     if (request.url === '/api/sync/logs' && (request.method === 'PUT' || request.method === 'GET')) return await syncLogs(request, response)
     return await serveStatic(request, response)
@@ -132,3 +334,7 @@ createServer(async (request, response) => {
 }).listen(port, () => {
   console.log(`Project Fit server listening on ${port}`)
 })
+
+setInterval(() => {
+  runReminderSweep().catch((error) => console.error('Reminder sweep failed', error))
+}, 60_000)
