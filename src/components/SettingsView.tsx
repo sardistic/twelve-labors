@@ -56,6 +56,24 @@ export function SettingsView({ settings, onChange }: Props) {
         <button type="button" className={settings.theme === 'light' ? 'active' : ''} onClick={() => update('theme', 'light')}>Light</button>
         <button type="button" className={settings.theme === 'dark' ? 'active' : ''} onClick={() => update('theme', 'dark')}>Dark</button>
       </div>
+      <div className="onboarding-grid">
+        <label>
+          Weight
+          <input inputMode="decimal" value={settings.weight} onChange={(event) => update('weight', event.target.value)} placeholder="185" />
+        </label>
+        <label>
+          Height
+          <input value={settings.height} onChange={(event) => update('height', event.target.value)} placeholder="5'10&quot;" />
+        </label>
+        <label>
+          Age
+          <input inputMode="numeric" value={settings.age} onChange={(event) => update('age', event.target.value)} placeholder="32" />
+        </label>
+        <label>
+          Gym type
+          <input value={settings.gymType} onChange={(event) => update('gymType', event.target.value)} placeholder="Planet Fitness" />
+        </label>
+      </div>
       <div className="settings-grid">
         <label>
           Ramp weeks
@@ -75,8 +93,12 @@ export function SettingsView({ settings, onChange }: Props) {
         </label>
       </div>
       <label className="settings-notes">
+        Injury flags
+        <textarea value={settings.injuryFlags} onChange={(event) => update('injuryFlags', event.target.value)} placeholder="shoulder, knee, back, recovery constraints" />
+      </label>
+      <label className="settings-notes">
         Training notes
-        <textarea value={settings.notes} onChange={(event) => update('notes', event.target.value)} placeholder="injury flags, preferred machines, schedule notes" />
+        <textarea value={settings.notes} onChange={(event) => update('notes', event.target.value)} placeholder="preferred machines, schedule notes, coaching reminders" />
       </label>
     </section>
   )

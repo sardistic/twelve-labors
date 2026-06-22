@@ -980,6 +980,38 @@ textarea:focus {
   text-transform: uppercase;
 }
 
+.equipment-card {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  border-top: 2px solid var(--line);
+  background: var(--paper-deep);
+  padding: 12px 14px;
+}
+
+.equipment-card > span {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  border: 2px solid var(--line);
+  background: var(--yellow);
+  color: var(--ink);
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+
+.equipment-card strong {
+  display: block;
+  text-transform: uppercase;
+}
+
+.equipment-card p {
+  margin: 4px 0 0;
+  color: var(--muted);
+}
+
 .log-grid {
   display: grid;
   gap: 0;
@@ -1147,6 +1179,93 @@ textarea:focus {
 .timer-card {
   display: grid;
   gap: 12px;
+}
+
+.schedule-panel {
+  display: grid;
+  gap: 10px;
+  border: 2px solid var(--line);
+  background: var(--paper);
+  box-shadow: var(--shadow);
+  padding: 12px;
+}
+
+.section-heading.compact {
+  grid-template-columns: 74px minmax(0, 1fr);
+  border: 2px solid var(--line);
+}
+
+.section-heading.compact::after {
+  display: none;
+}
+
+.section-heading.compact h2 {
+  padding: 10px 12px;
+  font-size: 1.45rem;
+}
+
+.adherence-strip {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  border: 2px solid var(--line);
+  background: var(--green);
+  color: #fff8e8;
+  padding: 10px;
+}
+
+.adherence-strip strong {
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.adherence-strip span {
+  color: #fff8e8;
+}
+
+.schedule-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 5px;
+}
+
+.schedule-row button {
+  display: grid;
+  gap: 4px;
+  min-height: 58px;
+  border: 2px solid var(--line);
+  background: #fffaf0;
+  color: var(--ink);
+  box-shadow: 2px 2px 0 var(--line);
+}
+
+.schedule-row button.done {
+  background: var(--green);
+  color: #fff8e8;
+}
+
+.schedule-row button.missed {
+  background: var(--red);
+  color: #fff8e8;
+}
+
+.schedule-row button.future {
+  background: var(--paper-deep);
+}
+
+.schedule-row span {
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  font-size: 0.68rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.schedule-panel p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.35;
 }
 
 .sync-panel {
@@ -1656,6 +1775,12 @@ textarea:focus {
   gap: 8px;
 }
 
+.onboarding-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
 .settings-notes {
   display: grid;
 }
@@ -1720,6 +1845,35 @@ textarea:focus {
   background: #fffaf0;
   border-radius: 0;
   padding: 12px;
+}
+
+.history-chart {
+  display: grid;
+  gap: 8px;
+  border: 2px solid var(--line);
+  background: var(--paper-deep);
+  padding: 10px;
+}
+
+.history-chart svg {
+  width: 100%;
+  height: 112px;
+  border: 2px solid var(--line);
+  background:
+    linear-gradient(var(--faint) 1px, transparent 1px) 0 0 / 100% 25%,
+    #fffaf0;
+}
+
+.history-chart polyline {
+  fill: none;
+  stroke: var(--blue);
+  stroke-width: 4;
+  stroke-linecap: square;
+  stroke-linejoin: bevel;
+}
+
+.history-chart span {
+  color: var(--muted);
 }
 
 .drawer-list article div {
@@ -1934,7 +2088,10 @@ html:has(.app-shell[data-theme="dark"]) body::after {
 .app-shell[data-theme="dark"] .exercise-log-footer label,
 .app-shell[data-theme="dark"] .tag-field,
 .app-shell[data-theme="dark"] .current-actions,
-.app-shell[data-theme="dark"] .target-box {
+.app-shell[data-theme="dark"] .target-box,
+.app-shell[data-theme="dark"] .equipment-card,
+.app-shell[data-theme="dark"] .schedule-panel,
+.app-shell[data-theme="dark"] .history-chart {
   background: #202225;
 }
 
@@ -1947,7 +2104,10 @@ html:has(.app-shell[data-theme="dark"]) body::after {
 .app-shell[data-theme="dark"] .option-button,
 .app-shell[data-theme="dark"] .collapsed-exercise-button,
 .app-shell[data-theme="dark"] .theme-switch button,
-.app-shell[data-theme="dark"] .current-actions button:last-child {
+.app-shell[data-theme="dark"] .current-actions button:last-child,
+.app-shell[data-theme="dark"] .schedule-row button,
+.app-shell[data-theme="dark"] .drawer-list article,
+.app-shell[data-theme="dark"] .history-chart svg {
   background: #101113;
   color: var(--ink);
   border-color: #5f584c;
@@ -2140,8 +2300,14 @@ html:has(.app-shell[data-theme="dark"]) body::after {
   .metric-grid,
   .goal-grid,
   .body-grid,
+  .onboarding-grid,
   .settings-grid {
     grid-template-columns: 1fr;
+  }
+
+  .schedule-row {
+    grid-template-columns: repeat(5, minmax(62px, 1fr));
+    overflow-x: auto;
   }
 
   .collapsed-exercise-button {
@@ -2351,5 +2517,13 @@ html:has(.app-shell[data-theme="dark"]) body::after {
   .data-actions,
   .theme-switch {
     grid-template-columns: 1fr;
+  }
+
+  .schedule-row {
+    grid-template-columns: repeat(5, 72px);
+  }
+
+  .equipment-card {
+    grid-template-columns: 46px minmax(0, 1fr);
   }
 }

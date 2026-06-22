@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { Difficulty, ExerciseLog, ExerciseSlot, OptionKind } from '../types'
 import { progressionHint, repsSummary } from '../lib/progression'
+import { equipmentIcon, equipmentLabels, incrementRecommendation, inferEquipmentType } from '../lib/equipment'
 
 type Props = {
   slot: ExerciseSlot
@@ -11,6 +12,7 @@ type Props = {
   onActivate: () => void
   onNext: () => void
   onShowHistory: () => void
+  defaultIncrement: string
 }
 
 const optionLabels: Record<OptionKind, string> = {
@@ -34,7 +36,7 @@ const parseTags = (notes: string) => notes.split(',').map((tag) => tag.trim()).f
 
 const serializeTags = (tags: string[]) => Array.from(new Set(tags.map((tag) => tag.trim()).filter(Boolean))).join(', ')
 
-export function ExerciseCard({ slot, value, previous, isActive, onChange, onActivate, onNext, onShowHistory }: Props) {
+export function ExerciseCard({ slot, value, previous, isActive, onChange, onActivate, onNext, onShowHistory, defaultIncrement }: Props) {
   const initialOptionName = value?.selectedOptionName ?? slot.options[0]?.name ?? ''
   const [selectedOptionName, setSelectedOptionName] = useState(initialOptionName)
   const [customTag, setCustomTag] = useState('')
@@ -54,6 +56,7 @@ export function ExerciseCard({ slot, value, previous, isActive, onChange, onActi
     }
   }, [previous?.sets, selectedOptionName, slot.id, slot.setCount, value])
   const hint = progressionHint(slot, value, previous)
+  const equipmentType = inferEquipmentType(selectedOption)
   const completedCount = log.sets.filter((set) => set.weight.trim() && set.reps.trim()).length
   const selectedTags = parseTags(log.notes)
 
@@ -228,6 +231,13 @@ export function ExerciseCard({ slot, value, previous, isActive, onChange, onActi
         <div className="target-box">
           <strong>Muscle target</strong>
           <span>{selectedOption.muscleTarget}</span>
+        </div>
+        <div className="equipment-card">
+          <span>{equipmentIcon(equipmentType)}</span>
+          <div>
+            <strong>{equipmentLabels[equipmentType]}</strong>
+            <p>{incrementRecommendation(equipmentType, defaultIncrement)}</p>
+          </div>
         </div>
       </details>
     </article>

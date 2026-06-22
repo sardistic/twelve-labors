@@ -466,7 +466,7 @@ const serveStatic = async (request, response) => {
   const safePath = url.pathname === '/' ? 'index.html' : url.pathname.slice(1)
   const filePath = resolve(distDir, safePath)
   const target = filePath.startsWith(distDir) && existsSync(filePath) ? filePath : join(distDir, 'index.html')
-  const types = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.png': 'image/png' }
+  const types = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.png': 'image/png', '.webmanifest': 'application/manifest+json' }
   response.writeHead(200, { 'Content-Type': types[extname(target)] ?? 'application/octet-stream' })
   response.end(await readFile(target))
 }

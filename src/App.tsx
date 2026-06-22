@@ -6,6 +6,7 @@ import { ExerciseHistoryDrawer } from './components/ExerciseHistoryDrawer'
 import { HistoryView } from './components/HistoryView'
 import { PlanView } from './components/PlanView'
 import { ProgressionPanel } from './components/ProgressionPanel'
+import { SchedulePanel } from './components/SchedulePanel'
 import { SessionNotes } from './components/SessionNotes'
 import { SettingsView } from './components/SettingsView'
 import { SyncPanel } from './components/SyncPanel'
@@ -15,6 +16,7 @@ import { WorkoutTimer } from './components/WorkoutTimer'
 import { defaultWeekday, workoutPlan } from './data/workoutPlan'
 import { consumeDiscordCallback } from './lib/discordAuth'
 import { todayISO, weekdayFromDate } from './lib/dates'
+import { hydrateAppStorage } from './storage/appStorage'
 import { findPreviousExerciseLog, getLog, makeLogId, readLogs, upsertLog } from './storage/logStore'
 import { readSettings, writeSettings } from './storage/settingsStore'
 import { readSyncSession, writeSyncSession } from './storage/syncStore'
@@ -52,6 +54,16 @@ function App() {
   const [activeExerciseId, setActiveExerciseId] = useState('')
   const day = useMemo(() => workoutPlan.find((entry) => entry.id === selectedDay) ?? workoutPlan.find((entry) => entry.id === defaultWeekday)!, [selectedDay])
   const logs = useMemo(() => readLogs(), [log])
+
+  useEffect(() => {
+    hydrateAppStorage()
+      .then(({ settings: storedSettings, syncSession: storedSession }) => {
+        setSettings(storedSettings)
+        setSyncSession(storedSession)
+        setLog(getLog(date, selectedDay) ?? createBlankLog(date, selectedDay))
+      })
+      .catch((error) => console.error(error))
+  }, [])
 
   useEffect(() => {
     consumeDiscordCallback()
@@ -165,6 +177,7 @@ function App() {
                 onActivate={() => setActiveExerciseId(slot.id)}
                 onNext={() => activateNextExercise(slot.id)}
                 onShowHistory={() => setHistorySlot(slot)}
+                defaultIncrement={settings.defaultIncrement}
               />
             ))}
           </section>
@@ -180,6 +193,7 @@ function App() {
         <div className="side-column">
           <SyncPanel logs={logs} settings={settings} session={syncSession} onSessionChange={setAndStoreSyncSession} />
           <WorkoutTimer />
+          <SchedulePanel logs={logs} days={workoutPlan} onOpenDay={openDay} />
           <ProgressionPanel settings={settings} />
         </div>
       </div>

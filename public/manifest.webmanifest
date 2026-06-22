@@ -1,0 +1,18 @@
+{
+  "name": "Twelve Labors",
+  "short_name": "XII Labors",
+  "description": "Workout planner and progression tracker for a 6 PM weekday gym routine.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#efe6d4",
+  "theme_color": "#171717",
+  "icons": [
+    {
+      "src": "/twelve-labors-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

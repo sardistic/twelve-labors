@@ -1,11 +1,18 @@
 import type { BodyProfile, Goal, ThemeMode, TrainingSettings } from '../types'
+import { readValue, writeValue } from './dbStore'
 
 const settingsKey = 'project-fit.settings.v1'
+let settingsCache: TrainingSettings | null = null
 
 export const defaultSettings: TrainingSettings = {
   goal: 'recomp',
   bodyProfile: 'balanced',
   theme: 'light',
+  weight: '',
+  height: '',
+  age: '',
+  gymType: 'Planet Fitness',
+  injuryFlags: '',
   rampWeeks: 2,
   normalWeeks: 4,
   deloadWeek: 7,
@@ -30,6 +37,11 @@ export const normalizeSettings = (value: unknown): TrainingSettings => {
     goal: candidate.goal && goals.includes(candidate.goal) ? candidate.goal : defaultSettings.goal,
     bodyProfile: candidate.bodyProfile && bodyProfiles.includes(candidate.bodyProfile) ? candidate.bodyProfile : defaultSettings.bodyProfile,
     theme: candidate.theme && themes.includes(candidate.theme) ? candidate.theme : defaultSettings.theme,
+    weight: typeof candidate.weight === 'string' ? candidate.weight : defaultSettings.weight,
+    height: typeof candidate.height === 'string' ? candidate.height : defaultSettings.height,
+    age: typeof candidate.age === 'string' ? candidate.age : defaultSettings.age,
+    gymType: typeof candidate.gymType === 'string' ? candidate.gymType : defaultSettings.gymType,
+    injuryFlags: typeof candidate.injuryFlags === 'string' ? candidate.injuryFlags : defaultSettings.injuryFlags,
     rampWeeks: numberInRange(candidate.rampWeeks, defaultSettings.rampWeeks, 0, 12),
     normalWeeks: numberInRange(candidate.normalWeeks, defaultSettings.normalWeeks, 1, 20),
     deloadWeek: numberInRange(candidate.deloadWeek, defaultSettings.deloadWeek, 2, 24),
@@ -39,15 +51,30 @@ export const normalizeSettings = (value: unknown): TrainingSettings => {
 }
 
 export const readSettings = (): TrainingSettings => {
+  return settingsCache ?? defaultSettings
+}
+
+export const hydrateSettings = async (): Promise<TrainingSettings> => {
+  const stored = await readValue<TrainingSettings>(settingsKey)
+  if (stored) {
+    settingsCache = normalizeSettings(stored)
+    return settingsCache
+  }
+
   try {
-    return normalizeSettings(JSON.parse(localStorage.getItem(settingsKey) ?? 'null'))
+    settingsCache = normalizeSettings(JSON.parse(localStorage.getItem(settingsKey) ?? 'null'))
+    await writeValue(settingsKey, settingsCache)
+    localStorage.removeItem(settingsKey)
+    return settingsCache
   } catch {
-    return defaultSettings
+    settingsCache = defaultSettings
+    return settingsCache
   }
 }
 
 export const writeSettings = (settings: TrainingSettings) => {
   const normalized = normalizeSettings(settings)
-  localStorage.setItem(settingsKey, JSON.stringify(normalized))
+  settingsCache = normalized
+  void writeValue(settingsKey, normalized)
   return normalized
 }

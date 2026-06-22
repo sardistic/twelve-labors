@@ -75,6 +75,11 @@ export type TrainingSettings = {
   goal: Goal
   bodyProfile: BodyProfile
   theme: ThemeMode
+  weight: string
+  height: string
+  age: string
+  gymType: string
+  injuryFlags: string
   rampWeeks: number
   normalWeeks: number
   deloadWeek: number

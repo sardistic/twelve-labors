@@ -1,6 +1,8 @@
 import type { DayLog, Difficulty, Weekday } from '../types'
+import { readValue, writeValue } from './dbStore'
 
 const logsKey = 'project-fit.logs.v1'
+let logsCache: DayLog[] = []
 
 const safeParse = <T>(value: string | null, fallback: T): T => {
   if (!value) return fallback
@@ -11,7 +13,7 @@ const safeParse = <T>(value: string | null, fallback: T): T => {
   }
 }
 
-export const readLogs = (): DayLog[] => safeParse<DayLog[]>(localStorage.getItem(logsKey), [])
+export const readLogs = (): DayLog[] => logsCache
 
 const weekdays: Weekday[] = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday']
 const difficulties: Difficulty[] = ['easy', 'good', 'hard', 'too-hard']
@@ -59,8 +61,25 @@ export const validateLogs = (value: unknown): DayLog[] => {
   })
 }
 
+export const hydrateLogs = async () => {
+  const stored = await readValue<DayLog[]>(logsKey)
+  if (stored) {
+    logsCache = validateLogs(stored)
+    return logsCache
+  }
+
+  const legacy = safeParse<DayLog[]>(localStorage.getItem(logsKey), [])
+  logsCache = validateLogs(legacy)
+  if (logsCache.length) {
+    await writeValue(logsKey, logsCache)
+    localStorage.removeItem(logsKey)
+  }
+  return logsCache
+}
+
 export const writeLogs = (logs: DayLog[]) => {
-  localStorage.setItem(logsKey, JSON.stringify(logs))
+  logsCache = validateLogs(logs)
+  void writeValue(logsKey, logsCache)
 }
 
 export const makeLogId = (date: string, dayId: Weekday) => `${date}:${dayId}`
