@@ -1,7 +1,7 @@
 :root {
   font-family: "Arial Narrow", "Roboto Condensed", "Segoe UI", Arial, sans-serif;
   color: #171717;
-  background: #ebe4d5;
+  background: #0f172a;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -26,11 +26,7 @@
 }
 
 html {
-  background-color: #ebe4d5;
-  background-image:
-    linear-gradient(rgba(23, 23, 23, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(23, 23, 23, 0.035) 1px, transparent 1px);
-  background-size: 24px 24px, 24px 24px;
+  background: #0f172a;
 }
 
 body {
@@ -48,12 +44,12 @@ body::before {
   z-index: 0;
   pointer-events: none;
   background-image:
-    radial-gradient(circle, rgba(214, 68, 47, 0.13) 1px, transparent 1.4px),
-    radial-gradient(circle, rgba(36, 89, 166, 0.11) 1px, transparent 1.5px),
-    radial-gradient(circle, rgba(46, 125, 89, 0.10) 1px, transparent 1.5px);
-  background-size: 22px 22px, 44px 44px, 72px 72px;
-  background-position: 0 0, 14px 18px, 38px 30px;
-  opacity: 0.72;
+    radial-gradient(circle, rgba(139, 92, 246, 0.38) 1px, transparent 1.5px),
+    radial-gradient(circle, rgba(59, 130, 246, 0.28) 1px, transparent 1.5px),
+    radial-gradient(circle, rgba(236, 72, 153, 0.30) 1px, transparent 1.5px);
+  background-size: 20px 20px, 42px 42px, 68px 68px;
+  background-position: 0 0, 10px 10px, 30px 30px;
+  opacity: 0.82;
   transform: translate3d(0, 0, 0);
   animation: dotted-drift 42s linear infinite;
 }
@@ -1776,20 +1772,17 @@ textarea:focus {
 }
 
 html:has(.app-shell[data-theme="dark"]) {
-  background-color: #0d0e0f;
-  background-image:
-    linear-gradient(rgba(237, 229, 214, 0.028) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(237, 229, 214, 0.028) 1px, transparent 1px);
+  background: #0b1020;
 }
 
 html:has(.app-shell[data-theme="dark"]) body::before {
   background-image:
-    radial-gradient(circle, rgba(139, 92, 246, 0.26) 1px, transparent 1.5px),
-    radial-gradient(circle, rgba(59, 130, 246, 0.20) 1px, transparent 1.5px),
-    radial-gradient(circle, rgba(236, 72, 153, 0.18) 1px, transparent 1.5px);
+    radial-gradient(circle, rgba(139, 92, 246, 0.42) 1px, transparent 1.5px),
+    radial-gradient(circle, rgba(59, 130, 246, 0.30) 1px, transparent 1.5px),
+    radial-gradient(circle, rgba(236, 72, 153, 0.32) 1px, transparent 1.5px);
   background-size: 20px 20px, 42px 42px, 68px 68px;
   background-position: 0 0, 10px 10px, 30px 30px;
-  opacity: 0.68;
+  opacity: 0.88;
 }
 
 .app-shell[data-theme="dark"]::before {

@@ -1,22 +1,15 @@
-import { importLogs, readLogs } from '../storage/logStore'
+import { readLogs } from '../storage/logStore'
 import { goalLabels, progressionBias } from '../lib/trainingGuidance'
 import type { TrainingSettings } from '../types'
 
 type Props = {
-  onImported: () => void
   settings: TrainingSettings
 }
 
-export function ProgressionPanel({ onImported, settings }: Props) {
+export function ProgressionPanel({ settings }: Props) {
   const logs = readLogs()
   const completed = logs.length
   const latest = logs[0]
-
-  const handleImport = async (file: File | null) => {
-    if (!file) return
-    await importLogs(file)
-    onImported()
-  }
 
   return (
     <aside className="progression-panel">
@@ -52,15 +45,6 @@ export function ProgressionPanel({ onImported, settings }: Props) {
         <strong>{completed}</strong>
         <p>{latest ? `Latest: ${latest.date}` : 'No sessions logged yet.'}</p>
       </div>
-      <details className="legacy-data-panel">
-        <summary><span>Local backup</span><strong>JSON tools</strong></summary>
-        <div className="data-actions">
-          <label className="import-button">
-            Import JSON
-            <input type="file" accept="application/json" onChange={(event) => handleImport(event.target.files?.[0] ?? null)} />
-          </label>
-        </div>
-      </details>
     </aside>
   )
 }

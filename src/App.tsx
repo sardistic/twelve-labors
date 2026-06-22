@@ -46,13 +46,12 @@ function App() {
   const [date, setDate] = useState(todayISO())
   const [selectedDay, setSelectedDay] = useState<Weekday>(() => weekdayFromDate(todayISO()))
   const [log, setLog] = useState<DayLog>(() => getLog(todayISO(), weekdayFromDate(todayISO())) ?? createBlankLog(todayISO(), weekdayFromDate(todayISO())))
-  const [dataRevision, setDataRevision] = useState(0)
   const [settings, setSettings] = useState<TrainingSettings>(() => readSettings())
   const [syncSession, setSyncSession] = useState<SyncSession | null>(() => readSyncSession())
   const [historySlot, setHistorySlot] = useState<ExerciseSlot | null>(null)
   const [activeExerciseId, setActiveExerciseId] = useState('')
   const day = useMemo(() => workoutPlan.find((entry) => entry.id === selectedDay) ?? workoutPlan.find((entry) => entry.id === defaultWeekday)!, [selectedDay])
-  const logs = useMemo(() => readLogs(), [dataRevision, log])
+  const logs = useMemo(() => readLogs(), [log])
 
   useEffect(() => {
     consumeDiscordCallback()
@@ -67,7 +66,7 @@ function App() {
   useEffect(() => {
     const existing = getLog(date, selectedDay)
     setLog(existing ?? createBlankLog(date, selectedDay))
-  }, [date, selectedDay, dataRevision])
+  }, [date, selectedDay])
 
   useEffect(() => {
     setActiveExerciseId((current) => (day.exercises.some((slot) => slot.id === current) ? current : day.exercises[0]?.id ?? ''))
@@ -111,10 +110,6 @@ function App() {
 
   const updateSessionField = (field: 'bodyWeight' | 'energy' | 'cardio' | 'notes', value: string) => {
     persist({ ...log, [field]: value })
-  }
-
-  const handleImported = () => {
-    setDataRevision((value) => value + 1)
   }
 
   const updateSettings = (next: TrainingSettings) => {
@@ -185,7 +180,7 @@ function App() {
         <div className="side-column">
           <SyncPanel logs={logs} settings={settings} session={syncSession} onSessionChange={setAndStoreSyncSession} />
           <WorkoutTimer />
-          <ProgressionPanel onImported={handleImported} settings={settings} />
+          <ProgressionPanel settings={settings} />
         </div>
       </div>
     </>
