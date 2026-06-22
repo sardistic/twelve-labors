@@ -47,13 +47,10 @@ body::before {
   inset: -12vh -12vw;
   z-index: 0;
   pointer-events: none;
-  background-image:
-    radial-gradient(circle, rgba(92, 48, 160, 0.52) 1.55px, transparent 2px),
-    radial-gradient(circle, rgba(31, 91, 162, 0.26) 1.45px, transparent 2px),
-    radial-gradient(circle, rgba(177, 42, 108, 0.40) 1.5px, transparent 2px);
-  background-size: 20px 20px, 42px 42px, 68px 68px;
-  background-position: 0 0, 10px 10px, 30px 30px;
-  opacity: 0.82;
+  background-image: url("data:image/svg+xml,%3Csvg width='132' height='132' viewBox='0 0 132 132' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='12' cy='14' r='2.4' fill='%235c30a0' fill-opacity='.55'/%3E%3Crect x='38' y='22' width='4.8' height='4.8' fill='%231f5ba2' fill-opacity='.3'/%3E%3Cpath d='M90 12l4 4-4 4-4-4z' fill='%23b12a6c' fill-opacity='.42'/%3E%3Cpath d='M24 78l4.8 8.4h-9.6z' fill='%232e7d59' fill-opacity='.38'/%3E%3Ccircle cx='106' cy='72' r='1.7' fill='%23d6442f' fill-opacity='.36'/%3E%3Crect x='62' y='102' width='3.2' height='3.2' fill='%235c30a0' fill-opacity='.32'/%3E%3Cpath d='M118 116l3 3-3 3-3-3z' fill='%231f5ba2' fill-opacity='.24'/%3E%3C/svg%3E");
+  background-size: 132px 132px;
+  background-position: 0 0;
+  opacity: 0.9;
   transform: translate3d(0, 0, 0);
   animation: dotted-drift 42s linear infinite;
 }
@@ -64,42 +61,39 @@ body::after {
   inset: -12vh -12vw;
   z-index: 0;
   pointer-events: none;
-  background-image:
-    linear-gradient(45deg, transparent 42%, rgba(46, 125, 89, 0.34) 42% 58%, transparent 58%),
-    linear-gradient(90deg, rgba(214, 68, 47, 0.34) 0 3px, transparent 3px),
-    linear-gradient(0deg, rgba(36, 89, 166, 0.24) 0 4px, transparent 4px);
-  background-size: 54px 54px, 86px 86px, 112px 112px;
-  background-position: 18px 12px, 32px 26px, 74px 48px;
-  opacity: 0.5;
+  background-image: url("data:image/svg+xml,%3Csvg width='180' height='180' viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='18' y='28' width='6' height='6' fill='%23d6442f' fill-opacity='.30'/%3E%3Cpath d='M78 32l5 8.5H73z' fill='%232459a6' fill-opacity='.26'/%3E%3Ccircle cx='142' cy='42' r='3.4' fill='%235c30a0' fill-opacity='.28'/%3E%3Cpath d='M42 128l5.5 5.5-5.5 5.5-5.5-5.5z' fill='%23b12a6c' fill-opacity='.28'/%3E%3Crect x='126' y='132' width='3.8' height='3.8' fill='%232e7d59' fill-opacity='.24'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+  background-position: 22px 18px;
+  opacity: 0.72;
   transform: translate3d(0, 0, 0);
   animation: shape-drift 68s linear infinite;
 }
 
 @keyframes dotted-drift {
   0% {
-    background-position: 0 0, 14px 18px, 38px 30px;
+    background-position: 0 0;
   }
 
   50% {
-    background-position: 18px 10px, -10px 34px, 54px -6px;
+    background-position: 36px 22px;
   }
 
   100% {
-    background-position: 44px 22px, -30px 62px, 110px -34px;
+    background-position: 132px 66px;
   }
 }
 
 @keyframes shape-drift {
   0% {
-    background-position: 18px 12px, 32px 26px, 74px 48px;
+    background-position: 22px 18px;
   }
 
   50% {
-    background-position: -12px 36px, 54px -8px, 22px 84px;
+    background-position: -18px 58px;
   }
 
   100% {
-    background-position: -58px 74px, 96px -44px, -34px 128px;
+    background-position: -158px 118px;
   }
 }
 
@@ -1812,21 +1806,13 @@ html:has(.app-shell[data-theme="dark"]) {
 }
 
 html:has(.app-shell[data-theme="dark"]) body::before {
-  background-image:
-    radial-gradient(circle, rgba(139, 92, 246, 0.56) 1.65px, transparent 2.15px),
-    radial-gradient(circle, rgba(59, 130, 246, 0.24) 1.5px, transparent 2.05px),
-    radial-gradient(circle, rgba(236, 72, 153, 0.38) 1.55px, transparent 2.1px);
-  background-size: 20px 20px, 42px 42px, 68px 68px;
-  background-position: 0 0, 10px 10px, 30px 30px;
-  opacity: 0.88;
+  background-image: url("data:image/svg+xml,%3Csvg width='132' height='132' viewBox='0 0 132 132' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='12' cy='14' r='2.5' fill='%238b5cf6' fill-opacity='.58'/%3E%3Crect x='38' y='22' width='4.8' height='4.8' fill='%233b82f6' fill-opacity='.32'/%3E%3Cpath d='M90 12l4 4-4 4-4-4z' fill='%23ec4899' fill-opacity='.43'/%3E%3Cpath d='M24 78l4.8 8.4h-9.6z' fill='%2378916f' fill-opacity='.34'/%3E%3Ccircle cx='106' cy='72' r='1.7' fill='%23c46a56' fill-opacity='.36'/%3E%3Crect x='62' y='102' width='3.2' height='3.2' fill='%238b5cf6' fill-opacity='.34'/%3E%3Cpath d='M118 116l3 3-3 3-3-3z' fill='%233b82f6' fill-opacity='.24'/%3E%3C/svg%3E");
+  opacity: 0.92;
 }
 
 html:has(.app-shell[data-theme="dark"]) body::after {
-  background-image:
-    linear-gradient(45deg, transparent 42%, rgba(121, 101, 190, 0.34) 42% 58%, transparent 58%),
-    linear-gradient(90deg, rgba(236, 72, 153, 0.28) 0 3px, transparent 3px),
-    linear-gradient(0deg, rgba(59, 130, 246, 0.22) 0 4px, transparent 4px);
-  opacity: 0.56;
+  background-image: url("data:image/svg+xml,%3Csvg width='180' height='180' viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='18' y='28' width='6' height='6' fill='%23ec4899' fill-opacity='.30'/%3E%3Cpath d='M78 32l5 8.5H73z' fill='%233b82f6' fill-opacity='.28'/%3E%3Ccircle cx='142' cy='42' r='3.4' fill='%238b5cf6' fill-opacity='.30'/%3E%3Cpath d='M42 128l5.5 5.5-5.5 5.5-5.5-5.5z' fill='%23ec4899' fill-opacity='.28'/%3E%3Crect x='126' y='132' width='3.8' height='3.8' fill='%2378916f' fill-opacity='.22'/%3E%3C/svg%3E");
+  opacity: 0.72;
 }
 
 .app-shell[data-theme="dark"]::before {
