@@ -1,7 +1,7 @@
 :root {
   font-family: "Arial Narrow", "Roboto Condensed", "Segoe UI", Arial, sans-serif;
   color: #171717;
-  background: #0f172a;
+  background: #ebe4d5;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -26,7 +26,11 @@
 }
 
 html {
-  background: #0f172a;
+  background-color: #ebe4d5;
+  background-image:
+    linear-gradient(rgba(23, 23, 23, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(23, 23, 23, 0.035) 1px, transparent 1px);
+  background-size: 24px 24px, 24px 24px;
 }
 
 body {
