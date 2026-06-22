@@ -37,6 +37,45 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: -12vh -12vw;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle, rgba(214, 68, 47, 0.13) 1px, transparent 1.4px),
+    radial-gradient(circle, rgba(36, 89, 166, 0.11) 1px, transparent 1.5px),
+    radial-gradient(circle, rgba(46, 125, 89, 0.10) 1px, transparent 1.5px);
+  background-size: 22px 22px, 44px 44px, 72px 72px;
+  background-position: 0 0, 14px 18px, 38px 30px;
+  opacity: 0.72;
+  transform: translate3d(0, 0, 0);
+  animation: dotted-drift 42s linear infinite;
+}
+
+@keyframes dotted-drift {
+  0% {
+    background-position: 0 0, 14px 18px, 38px 30px;
+  }
+
+  50% {
+    background-position: 18px 10px, -10px 34px, 54px -6px;
+  }
+
+  100% {
+    background-position: 44px 22px, -30px 62px, 110px -34px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before {
+    animation: none;
+  }
 }
 
 button,
@@ -52,6 +91,7 @@ button {
 
 .app-shell {
   position: relative;
+  z-index: 1;
   width: min(1420px, calc(100vw - 32px));
   margin: 0 auto;
   padding: 18px 0 72px 20px;
@@ -1740,6 +1780,16 @@ html:has(.app-shell[data-theme="dark"]) {
   background-image:
     linear-gradient(rgba(237, 229, 214, 0.028) 1px, transparent 1px),
     linear-gradient(90deg, rgba(237, 229, 214, 0.028) 1px, transparent 1px);
+}
+
+html:has(.app-shell[data-theme="dark"]) body::before {
+  background-image:
+    radial-gradient(circle, rgba(139, 92, 246, 0.26) 1px, transparent 1.5px),
+    radial-gradient(circle, rgba(59, 130, 246, 0.20) 1px, transparent 1.5px),
+    radial-gradient(circle, rgba(236, 72, 153, 0.18) 1px, transparent 1.5px);
+  background-size: 20px 20px, 42px 42px, 68px 68px;
+  background-position: 0 0, 10px 10px, 30px 30px;
+  opacity: 0.68;
 }
 
 .app-shell[data-theme="dark"]::before {
