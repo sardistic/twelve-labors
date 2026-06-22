@@ -44,9 +44,9 @@ body::before {
   z-index: 0;
   pointer-events: none;
   background-image:
-    radial-gradient(circle, rgba(139, 92, 246, 0.38) 1px, transparent 1.5px),
-    radial-gradient(circle, rgba(59, 130, 246, 0.28) 1px, transparent 1.5px),
-    radial-gradient(circle, rgba(236, 72, 153, 0.30) 1px, transparent 1.5px);
+    radial-gradient(circle, rgba(139, 92, 246, 0.38) 1.55px, transparent 2px),
+    radial-gradient(circle, rgba(59, 130, 246, 0.28) 1.45px, transparent 2px),
+    radial-gradient(circle, rgba(236, 72, 153, 0.30) 1.5px, transparent 2px);
   background-size: 20px 20px, 42px 42px, 68px 68px;
   background-position: 0 0, 10px 10px, 30px 30px;
   opacity: 0.82;
@@ -1777,9 +1777,9 @@ html:has(.app-shell[data-theme="dark"]) {
 
 html:has(.app-shell[data-theme="dark"]) body::before {
   background-image:
-    radial-gradient(circle, rgba(139, 92, 246, 0.42) 1px, transparent 1.5px),
-    radial-gradient(circle, rgba(59, 130, 246, 0.30) 1px, transparent 1.5px),
-    radial-gradient(circle, rgba(236, 72, 153, 0.32) 1px, transparent 1.5px);
+    radial-gradient(circle, rgba(139, 92, 246, 0.42) 1.65px, transparent 2.15px),
+    radial-gradient(circle, rgba(59, 130, 246, 0.30) 1.5px, transparent 2.05px),
+    radial-gradient(circle, rgba(236, 72, 153, 0.32) 1.55px, transparent 2.1px);
   background-size: 20px 20px, 42px 42px, 68px 68px;
   background-position: 0 0, 10px 10px, 30px 30px;
   opacity: 0.88;
