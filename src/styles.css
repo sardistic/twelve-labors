@@ -1168,6 +1168,69 @@ textarea:focus {
   line-height: 1.42;
 }
 
+.timer-phase-rail {
+  display: grid;
+  gap: 0;
+  border: 2px solid var(--line);
+  background: var(--paper-deep);
+}
+
+.timer-phase {
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  min-height: 38px;
+  padding: 7px 9px;
+  border-bottom: 2px solid var(--line);
+  color: var(--muted);
+}
+
+.timer-phase:last-child {
+  border-bottom: 0;
+}
+
+.timer-phase span {
+  color: inherit;
+  font-size: 0.66rem;
+}
+
+.timer-phase strong {
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  font-size: 0.78rem;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.timer-phase.complete {
+  background: color-mix(in srgb, var(--green) 16%, var(--paper));
+  color: var(--ink);
+}
+
+.timer-phase.active {
+  background: var(--yellow);
+  color: var(--ink);
+}
+
+.timer-phase.active::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  position: absolute;
+  left: 7px;
+  border: 2px solid var(--line);
+  background: var(--red);
+}
+
+.timer-phase {
+  position: relative;
+}
+
+.timer-phase.active span {
+  padding-left: 16px;
+}
+
 .timer-actions,
 .data-actions {
   display: grid;

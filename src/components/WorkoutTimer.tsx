@@ -6,12 +6,20 @@ const formatTime = (seconds: number) => {
   return `${minutes}:${remaining}`
 }
 
+const phases = [
+  { id: 'warmup', label: 'Warm-up', start: 0, end: 7 * 60 },
+  { id: 'main', label: 'Main lifts', start: 7 * 60, end: 45 * 60 },
+  { id: 'finisher', label: 'Finisher', start: 45 * 60, end: 55 * 60 },
+  { id: 'wrap', label: 'Log + wrap', start: 55 * 60, end: 60 * 60 }
+]
+
 export function WorkoutTimer() {
   const [running, setRunning] = useState(false)
   const [startedAt, setStartedAt] = useState<number | null>(null)
   const [elapsed, setElapsed] = useState(0)
   const target = 60 * 60
   const remaining = Math.max(target - elapsed, 0)
+  const activePhase = phases.find((phase) => elapsed >= phase.start && elapsed < phase.end) ?? phases[phases.length - 1]
   const status = useMemo(() => {
     if (elapsed < 7 * 60) return 'Warm-up window'
     if (elapsed < 45 * 60) return 'Main lift window'
@@ -49,6 +57,18 @@ export function WorkoutTimer() {
         <span>Session timer</span>
         <strong>{formatTime(remaining)}</strong>
         <p>{status}</p>
+      </div>
+      <div className="timer-phase-rail" aria-label="Session steps">
+        {phases.map((phase) => {
+          const state = phase.id === activePhase.id ? 'active' : elapsed >= phase.end ? 'complete' : 'upcoming'
+          const minutes = `${Math.floor(phase.start / 60)}-${Math.floor(phase.end / 60)}`
+          return (
+            <div key={phase.id} className={`timer-phase ${state}`}>
+              <span>{minutes}</span>
+              <strong>{phase.label}</strong>
+            </div>
+          )
+        })}
       </div>
       <div className="timer-actions">
         <button type="button" onClick={running ? pause : start}>{running ? 'Pause' : 'Start'}</button>
