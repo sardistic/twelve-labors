@@ -224,6 +224,22 @@ function App() {
         {activeView === 'settings' ? <SettingsView settings={settings} onChange={updateSettings} /> : null}
       </section>
 
+      <footer className="site-footer">
+        <p>© {new Date().getFullYear()} Sardistic.com. All rights reserved.</p>
+        <a
+          className="sardistic-signature"
+          href="https://sardistic.com"
+          target="_blank"
+          rel="noreferrer"
+          aria-label="Visit sardistic.com"
+        >
+          <span className="sardistic-mark" aria-hidden="true">
+            <img src="https://veles.cards/liquid.gif" alt="" />
+          </span>
+          <span className="sardistic-wordmark" aria-hidden="true">ardistic.com</span>
+        </a>
+      </footer>
+
       <ExerciseHistoryDrawer slot={historySlot} logs={logs} onClose={() => setHistorySlot(null)} />
     </main>
   )
