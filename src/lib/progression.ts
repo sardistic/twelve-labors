@@ -1,6 +1,7 @@
 import type { ExerciseLog, ExerciseSlot, ProgressionHint } from '../types'
 
 const numberOrNull = (value: string) => {
+  if (/^(bw|bodyweight)$/i.test(value.trim())) return 0
   const parsed = Number(value)
   return Number.isFinite(parsed) ? parsed : null
 }
@@ -27,7 +28,7 @@ export const progressionHint = (slot: ExerciseSlot, current: ExerciseLog | null,
   if (!current && !previous) {
     return {
       label: 'Start conservative',
-      description: 'Pick a weight you can move cleanly with about 2 reps left at the end of each set.',
+      description: 'Pick a resistance or variation you can move cleanly with about 2 reps left at the end of each set.',
       tone: 'neutral'
     }
   }
@@ -43,7 +44,7 @@ export const progressionHint = (slot: ExerciseSlot, current: ExerciseLog | null,
   if (!current) {
     return {
       label: 'Log this lift',
-      description: 'Enter weight and reps after each set so next week has a target.',
+      description: 'Enter load and reps after each set so next week has a target. Use BW for bodyweight work.',
       tone: 'neutral'
     }
   }
@@ -65,30 +66,30 @@ export const progressionHint = (slot: ExerciseSlot, current: ExerciseLog | null,
   if (current.difficulty === 'too-hard') {
     return {
       label: 'Reduce or repeat',
-      description: 'Form broke or the set failed. Reduce weight next time or repeat with cleaner reps.',
+      description: 'Form broke or the set failed. Reduce resistance, choose an easier variation, or repeat with cleaner reps.',
       tone: 'warning'
     }
   }
 
   if (maxRep && reps.every((rep) => rep !== null && rep >= maxRep)) {
     return {
-      label: 'Increase weight next time',
-      description: `You reached the top of ${slot.repRange} on every set. Add the smallest available jump next time.`,
+      label: 'Progress next time',
+      description: `You reached the top of ${slot.repRange} on every set. Add the smallest available load jump or choose a harder variation.`,
       tone: 'positive'
     }
   }
 
   if (previous) {
     return {
-      label: 'Add reps before weight',
-      description: `Previous: ${repsSummary(previous)}. Keep the same weight until every set reaches ${slot.repRange}.`,
+      label: 'Add reps before resistance',
+      description: `Previous: ${repsSummary(previous)}. Keep the same load or variation until every set reaches ${slot.repRange}.`,
       tone: 'neutral'
     }
   }
 
   return {
     label: 'Build the range',
-    description: `Keep this weight until every set reaches ${slot.repRange} with clean form.`,
+    description: `Keep this load or variation until every set reaches ${slot.repRange} with clean form.`,
     tone: 'neutral'
   }
 }

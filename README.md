@@ -28,7 +28,7 @@ npm run preview
 
 ## What exists
 
-- Monday-Friday workout plan
+- Selectable Monday-Friday gym-machine and no-equipment home-bodyweight programs
 - 6 PM weekday schedule panel
 - Option trees for primary, backup, and fallback movements
 - Machine descriptions
@@ -40,6 +40,7 @@ npm run preview
 - Previous session lookup by exercise
 - Double-progression recommendations
 - Body profile and workout aim settings that alter training guidance
+- Training program setting that switches Today, Plan, History, and weekly adherence between gym and home-bodyweight regimens
 - Onboarding-style settings for weight, height, age, gym type, and injury flags
 - Session tag logging and cardio log
 - 60-minute workout timer with active phase highlighting

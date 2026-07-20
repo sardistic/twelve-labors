@@ -13,6 +13,7 @@ import { SyncPanel } from './components/SyncPanel'
 import { WorkoutBrief } from './components/WorkoutBrief'
 import { WorkoutHeader } from './components/WorkoutHeader'
 import { WorkoutTimer } from './components/WorkoutTimer'
+import { homeBodyweightPlan } from './data/homeBodyweightPlan'
 import { defaultWeekday, workoutPlan } from './data/workoutPlan'
 import { consumeDiscordCallback } from './lib/discordAuth'
 import { todayISO, weekdayFromDate } from './lib/dates'
@@ -20,7 +21,7 @@ import { hydrateAppStorage } from './storage/appStorage'
 import { findPreviousExerciseLog, getLog, makeLogId, readLogs, upsertLog } from './storage/logStore'
 import { readSettings, writeSettings } from './storage/settingsStore'
 import { readSyncSession, writeSyncSession } from './storage/syncStore'
-import type { DayLog, ExerciseLog, ExerciseSlot, SyncSession, TrainingSettings, Weekday } from './types'
+import type { DayLog, ExerciseLog, ExerciseSlot, SyncSession, TrainingSettings, Weekday, WorkoutProgram } from './types'
 import './styles.css'
 
 type View = 'today' | 'plan' | 'history' | 'settings'
@@ -32,10 +33,11 @@ const viewMeta: Record<View, { code: string; page: string; label: string }> = {
   settings: { code: 'PF-04', page: '004', label: 'Cycle controls' }
 }
 
-const createBlankLog = (date: string, dayId: Weekday): DayLog => ({
-  id: makeLogId(date, dayId),
+const createBlankLog = (date: string, dayId: Weekday, workoutProgram: WorkoutProgram): DayLog => ({
+  id: makeLogId(date, dayId, workoutProgram),
   date,
   dayId,
+  workoutProgram,
   bodyWeight: '',
   energy: 'normal',
   exercises: {},
@@ -47,20 +49,22 @@ function App() {
   const [activeView, setActiveView] = useState<View>('today')
   const [date, setDate] = useState(todayISO())
   const [selectedDay, setSelectedDay] = useState<Weekday>(() => weekdayFromDate(todayISO()))
-  const [log, setLog] = useState<DayLog>(() => getLog(todayISO(), weekdayFromDate(todayISO())) ?? createBlankLog(todayISO(), weekdayFromDate(todayISO())))
   const [settings, setSettings] = useState<TrainingSettings>(() => readSettings())
+  const [log, setLog] = useState<DayLog>(() => getLog(todayISO(), weekdayFromDate(todayISO()), readSettings().workoutProgram) ?? createBlankLog(todayISO(), weekdayFromDate(todayISO()), readSettings().workoutProgram))
   const [syncSession, setSyncSession] = useState<SyncSession | null>(() => readSyncSession())
   const [historySlot, setHistorySlot] = useState<ExerciseSlot | null>(null)
   const [activeExerciseId, setActiveExerciseId] = useState('')
-  const day = useMemo(() => workoutPlan.find((entry) => entry.id === selectedDay) ?? workoutPlan.find((entry) => entry.id === defaultWeekday)!, [selectedDay])
+  const activePlan = settings.workoutProgram === 'home-bodyweight' ? homeBodyweightPlan : workoutPlan
+  const day = useMemo(() => activePlan.find((entry) => entry.id === selectedDay) ?? activePlan.find((entry) => entry.id === defaultWeekday)!, [activePlan, selectedDay])
   const logs = useMemo(() => readLogs(), [log])
+  const programLogs = useMemo(() => logs.filter((entry) => entry.workoutProgram === settings.workoutProgram), [logs, settings.workoutProgram])
 
   useEffect(() => {
     hydrateAppStorage()
       .then(({ settings: storedSettings, syncSession: storedSession }) => {
         setSettings(storedSettings)
         setSyncSession(storedSession)
-        setLog(getLog(date, selectedDay) ?? createBlankLog(date, selectedDay))
+        setLog(getLog(date, selectedDay, storedSettings.workoutProgram) ?? createBlankLog(date, selectedDay, storedSettings.workoutProgram))
       })
       .catch((error) => console.error(error))
   }, [])
@@ -76,9 +80,9 @@ function App() {
   }, [])
 
   useEffect(() => {
-    const existing = getLog(date, selectedDay)
-    setLog(existing ?? createBlankLog(date, selectedDay))
-  }, [date, selectedDay])
+    const existing = getLog(date, selectedDay, settings.workoutProgram)
+    setLog(existing ?? createBlankLog(date, selectedDay, settings.workoutProgram))
+  }, [date, selectedDay, settings.workoutProgram])
 
   useEffect(() => {
     setActiveExerciseId((current) => (day.exercises.some((slot) => slot.id === current) ? current : day.exercises[0]?.id ?? ''))
@@ -129,7 +133,7 @@ function App() {
   }
 
   const showHistory = (slotId: string) => {
-    const slot = workoutPlan.flatMap((entry) => entry.exercises).find((exercise) => exercise.id === slotId) ?? null
+    const slot = activePlan.flatMap((entry) => entry.exercises).find((exercise) => exercise.id === slotId) ?? null
     setHistorySlot(slot)
   }
 
@@ -149,7 +153,7 @@ function App() {
 
   const renderToday = () => (
     <>
-      <DayTabs days={workoutPlan} selectedDay={selectedDay} onSelectDay={changeDay} />
+      <DayTabs days={activePlan} selectedDay={selectedDay} onSelectDay={changeDay} />
 
       <div className="layout-grid">
         <div className="main-column">
@@ -193,7 +197,7 @@ function App() {
         <div className="side-column">
           <SyncPanel logs={logs} settings={settings} session={syncSession} onSessionChange={setAndStoreSyncSession} />
           <WorkoutTimer />
-          <SchedulePanel logs={logs} days={workoutPlan} onOpenDay={openDay} />
+          <SchedulePanel logs={programLogs} days={activePlan} onOpenDay={openDay} />
           <ProgressionPanel settings={settings} />
         </div>
       </div>
@@ -207,7 +211,7 @@ function App() {
           <span className="brand-mark"><img src="/twelve-labors-logo.png" alt="Twelve Labors" /></span>
           <h1>Twelve Labors</h1>
         </div>
-        <p>Planet Fitness-style machine split · M-F · 6 PM · under 60 minutes</p>
+        <p>{settings.workoutProgram === 'home-bodyweight' ? 'Home bodyweight program · no equipment · M-F · under 45 minutes' : 'Planet Fitness-style machine split · M-F · 6 PM · under 60 minutes'}</p>
       </div>
 
       <AppNav activeView={activeView} onChange={setActiveView} />
@@ -219,8 +223,8 @@ function App() {
           <span>{viewMeta[activeView].label}</span>
         </div>
         {activeView === 'today' ? renderToday() : null}
-        {activeView === 'plan' ? <PlanView days={workoutPlan} onOpenDay={openDay} onShowHistory={showHistory} /> : null}
-        {activeView === 'history' ? <HistoryView logs={logs} days={workoutPlan} onOpenLog={openLog} /> : null}
+        {activeView === 'plan' ? <PlanView days={activePlan} onOpenDay={openDay} onShowHistory={showHistory} /> : null}
+        {activeView === 'history' ? <HistoryView logs={programLogs} days={activePlan} onOpenLog={openLog} /> : null}
         {activeView === 'settings' ? <SettingsView settings={settings} onChange={updateSettings} /> : null}
       </section>
 

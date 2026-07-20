@@ -4,6 +4,8 @@ export type OptionKind = 'primary' | 'backup' | 'fallback'
 
 export type Difficulty = 'easy' | 'good' | 'hard' | 'too-hard'
 
+export type WorkoutProgram = 'gym' | 'home-bodyweight'
+
 export type ExerciseOption = {
   kind: OptionKind
   name: string
@@ -52,6 +54,7 @@ export type DayLog = {
   id: string
   date: string
   dayId: Weekday
+  workoutProgram: WorkoutProgram
   bodyWeight: string
   energy: string
   exercises: Record<string, ExerciseLog>
@@ -74,6 +77,7 @@ export type BodyProfile = 'lean' | 'balanced' | 'larger' | 'returning'
 export type TrainingSettings = {
   goal: Goal
   bodyProfile: BodyProfile
+  workoutProgram: WorkoutProgram
   theme: ThemeMode
   weight: string
   height: string

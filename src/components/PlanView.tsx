@@ -22,7 +22,7 @@ export function PlanView({ days, onOpenDay, onShowHistory }: Props) {
                 <h3>{day.title}</h3>
                 <p>{day.focus}</p>
               </div>
-              <span>{day.exercises.length} lifts</span>
+              <span>{day.exercises.length} movements</span>
             </summary>
             <button className="open-day-button" type="button" onClick={() => onOpenDay(day.id)}>Open workout</button>
             <div className="plan-exercise-list">

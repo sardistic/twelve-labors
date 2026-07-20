@@ -1711,7 +1711,8 @@ textarea:focus {
 .plan-exercise-list button,
 .history-table button,
 .goal-grid button,
-.body-grid button {
+.body-grid button,
+.program-grid button {
   display: grid;
   gap: 6px;
   width: 100%;
@@ -1733,6 +1734,7 @@ textarea:focus {
 .history-table button:hover,
 .goal-grid button:hover,
 .body-grid button:hover,
+.program-grid button:hover,
 .timer-actions button:hover,
 .data-actions button:hover,
 .open-day-button:hover {
@@ -1742,7 +1744,8 @@ textarea:focus {
 
 .plan-exercise-list span,
 .goal-grid span,
-.body-grid span {
+.body-grid span,
+.program-grid span {
   color: var(--muted);
   line-height: 1.35;
 }
@@ -1841,19 +1844,26 @@ textarea:focus {
 }
 
 .goal-grid,
-.body-grid {
+.body-grid,
+.program-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 8px;
 }
 
+.program-grid {
+  grid-template-columns: repeat(2, 1fr);
+}
+
 .body-grid button,
-.goal-grid button {
+.goal-grid button,
+.program-grid button {
   min-height: 112px;
 }
 
 .goal-grid button.active,
-.body-grid button.active {
+.body-grid button.active,
+.program-grid button.active {
   background:
     repeating-linear-gradient(-45deg, rgba(255, 248, 232, 0.12) 0 7px, transparent 7px 14px),
     var(--red);
@@ -1861,7 +1871,8 @@ textarea:focus {
 }
 
 .goal-grid button.active span,
-.body-grid button.active span {
+.body-grid button.active span,
+.program-grid button.active span {
   color: #fff8e8;
 }
 
@@ -2396,6 +2407,7 @@ html:has(.app-shell[data-theme="dark"]) body::after {
   .metric-grid,
   .goal-grid,
   .body-grid,
+  .program-grid,
   .onboarding-grid,
   .settings-grid {
     grid-template-columns: 1fr;

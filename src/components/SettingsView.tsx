@@ -1,5 +1,5 @@
 import { bodyProfileLabels } from '../lib/trainingGuidance'
-import type { BodyProfile, Goal, TrainingSettings } from '../types'
+import type { BodyProfile, Goal, TrainingSettings, WorkoutProgram } from '../types'
 
 type Props = {
   settings: TrainingSettings
@@ -20,6 +20,11 @@ const bodyOptions: Array<{ id: BodyProfile; detail: string }> = [
   { id: 'returning', detail: 'Conservative effort while the habit locks in.' }
 ]
 
+const programOptions: Array<{ id: WorkoutProgram; label: string; detail: string }> = [
+  { id: 'gym', label: 'Gym machines', detail: 'The original five-day machine and free-weight split.' },
+  { id: 'home-bodyweight', label: 'Home bodyweight', detail: 'A no-equipment five-day plan with scalable movement options.' }
+]
+
 export function SettingsView({ settings, onChange }: Props) {
   const update = <Key extends keyof TrainingSettings>(key: Key, value: TrainingSettings[Key]) => onChange({ ...settings, [key]: value })
 
@@ -28,6 +33,17 @@ export function SettingsView({ settings, onChange }: Props) {
       <div className="section-heading">
         <span>Preferences</span>
         <h2>Settings</h2>
+      </div>
+      <div className="profile-block">
+        <span>Training program</span>
+        <div className="program-grid">
+          {programOptions.map((program) => (
+            <button key={program.id} type="button" className={settings.workoutProgram === program.id ? 'active' : ''} onClick={() => update('workoutProgram', program.id)}>
+              <strong>{program.label}</strong>
+              <span>{program.detail}</span>
+            </button>
+          ))}
+        </div>
       </div>
       <div className="profile-block">
         <span>Body profile</span>
@@ -70,8 +86,8 @@ export function SettingsView({ settings, onChange }: Props) {
           <input inputMode="numeric" value={settings.age} onChange={(event) => update('age', event.target.value)} placeholder="32" />
         </label>
         <label>
-          Gym type
-          <input value={settings.gymType} onChange={(event) => update('gymType', event.target.value)} placeholder="Planet Fitness" />
+          Training space
+          <input value={settings.gymType} onChange={(event) => update('gymType', event.target.value)} placeholder={settings.workoutProgram === 'home-bodyweight' ? 'Living room' : 'Planet Fitness'} />
         </label>
       </div>
       <div className="settings-grid">

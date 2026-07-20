@@ -1,4 +1,4 @@
-import type { DayLog, Difficulty, Weekday } from '../types'
+import type { DayLog, Difficulty, Weekday, WorkoutProgram } from '../types'
 import { readValue, writeValue } from './dbStore'
 
 const logsKey = 'project-fit.logs.v1'
@@ -17,6 +17,7 @@ export const readLogs = (): DayLog[] => logsCache
 
 const weekdays: Weekday[] = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday']
 const difficulties: Difficulty[] = ['easy', 'good', 'hard', 'too-hard']
+const workoutPrograms: WorkoutProgram[] = ['gym', 'home-bodyweight']
 
 const isString = (value: unknown): value is string => typeof value === 'string'
 
@@ -28,6 +29,7 @@ export const validateLogs = (value: unknown): DayLog[] => {
     const candidate = entry as Partial<DayLog>
     if (!isString(candidate.date) || !/^\d{4}-\d{2}-\d{2}$/.test(candidate.date)) throw new Error(`Log ${index + 1} has an invalid date.`)
     if (!candidate.dayId || !weekdays.includes(candidate.dayId)) throw new Error(`Log ${index + 1} has an invalid day.`)
+    const workoutProgram = candidate.workoutProgram && workoutPrograms.includes(candidate.workoutProgram) ? candidate.workoutProgram : 'gym'
     const exercises = candidate.exercises && typeof candidate.exercises === 'object' ? candidate.exercises : {}
     const normalizedExercises: DayLog['exercises'] = {}
 
@@ -49,9 +51,10 @@ export const validateLogs = (value: unknown): DayLog[] => {
     }
 
     return {
-      id: isString(candidate.id) ? candidate.id : makeLogId(candidate.date, candidate.dayId),
+      id: isString(candidate.id) ? candidate.id : makeLogId(candidate.date, candidate.dayId, workoutProgram),
       date: candidate.date,
       dayId: candidate.dayId,
+      workoutProgram,
       bodyWeight: isString(candidate.bodyWeight) ? candidate.bodyWeight : '',
       energy: isString(candidate.energy) ? candidate.energy : 'normal',
       exercises: normalizedExercises,
@@ -82,10 +85,12 @@ export const writeLogs = (logs: DayLog[]) => {
   void writeValue(logsKey, logsCache)
 }
 
-export const makeLogId = (date: string, dayId: Weekday) => `${date}:${dayId}`
+export const makeLogId = (date: string, dayId: Weekday, workoutProgram: WorkoutProgram = 'gym') => (
+  workoutProgram === 'gym' ? `${date}:${dayId}` : `${date}:${dayId}:${workoutProgram}`
+)
 
-export const getLog = (date: string, dayId: Weekday): DayLog | null => {
-  return readLogs().find((log) => log.id === makeLogId(date, dayId)) ?? null
+export const getLog = (date: string, dayId: Weekday, workoutProgram: WorkoutProgram = 'gym'): DayLog | null => {
+  return readLogs().find((log) => log.id === makeLogId(date, dayId, workoutProgram)) ?? null
 }
 
 export const upsertLog = (log: DayLog) => {
