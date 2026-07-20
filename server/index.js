@@ -61,7 +61,9 @@ const weekdayFromDate = (date) => {
   return 'monday'
 }
 
-const makeLogId = (date, dayId) => `${date}:${dayId}`
+const makeLogId = (date, dayId, workoutProgram = 'gym') => (
+  workoutProgram === 'gym' ? `${date}:${dayId}` : `${date}:${dayId}:${workoutProgram}`
+)
 
 const slugify = (value) => value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'exercise'
 
@@ -83,13 +85,16 @@ const writeUserData = async (userId, record) => {
 const getOrCreateTodayLog = (record) => {
   const date = todayISO()
   const dayId = weekdayFromDate(date)
-  const id = makeLogId(date, dayId)
+  const workoutProgram = record.settings?.workoutProgram === 'home-bodyweight' ? 'home-bodyweight' : 'gym'
+  const id = makeLogId(date, dayId, workoutProgram)
   const logs = Array.isArray(record.logs) ? record.logs : []
   let log = logs.find((entry) => entry.id === id)
   if (!log) {
-    log = { id, date, dayId, bodyWeight: '', energy: 'normal', exercises: {}, cardio: '', notes: '' }
+    log = { id, date, dayId, workoutProgram, bodyWeight: '', energy: 'normal', exercises: {}, cardio: '', notes: '' }
     logs.push(log)
     record.logs = logs
+  } else if (!log.workoutProgram) {
+    log.workoutProgram = workoutProgram
   }
   return log
 }

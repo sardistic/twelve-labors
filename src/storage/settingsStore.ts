@@ -1,4 +1,4 @@
-import type { BodyProfile, Goal, ThemeMode, TrainingSettings } from '../types'
+import type { BodyProfile, Goal, ThemeMode, TrainingSettings, WorkoutProgram } from '../types'
 import { readValue, writeValue } from './dbStore'
 
 const settingsKey = 'project-fit.settings.v1'
@@ -7,6 +7,7 @@ let settingsCache: TrainingSettings | null = null
 export const defaultSettings: TrainingSettings = {
   goal: 'recomp',
   bodyProfile: 'balanced',
+  workoutProgram: 'gym',
   theme: 'light',
   weight: '',
   height: '',
@@ -23,6 +24,7 @@ export const defaultSettings: TrainingSettings = {
 const goals: Goal[] = ['recomp', 'fat-loss', 'muscle-gain', 'strength']
 const bodyProfiles: BodyProfile[] = ['lean', 'balanced', 'larger', 'returning']
 const themes: ThemeMode[] = ['light', 'dark']
+const workoutPrograms: WorkoutProgram[] = ['gym', 'home-bodyweight']
 
 const numberInRange = (value: unknown, fallback: number, min: number, max: number) => {
   const parsed = Number(value)
@@ -36,6 +38,7 @@ export const normalizeSettings = (value: unknown): TrainingSettings => {
   return {
     goal: candidate.goal && goals.includes(candidate.goal) ? candidate.goal : defaultSettings.goal,
     bodyProfile: candidate.bodyProfile && bodyProfiles.includes(candidate.bodyProfile) ? candidate.bodyProfile : defaultSettings.bodyProfile,
+    workoutProgram: candidate.workoutProgram && workoutPrograms.includes(candidate.workoutProgram) ? candidate.workoutProgram : defaultSettings.workoutProgram,
     theme: candidate.theme && themes.includes(candidate.theme) ? candidate.theme : defaultSettings.theme,
     weight: typeof candidate.weight === 'string' ? candidate.weight : defaultSettings.weight,
     height: typeof candidate.height === 'string' ? candidate.height : defaultSettings.height,

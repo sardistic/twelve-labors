@@ -28,7 +28,7 @@ const difficultyLabels: Record<Difficulty, string> = {
   'too-hard': 'Too hard'
 }
 
-const buildEmptySets = (count: number) => Array.from({ length: count }, () => ({ weight: '', reps: '' }))
+const buildEmptySets = (count: number, defaultWeight = '') => Array.from({ length: count }, () => ({ weight: defaultWeight, reps: '' }))
 
 const noteTags = ['felt strong', 'pain', 'machine taken', 'low energy', 'form check', 'add weight', 'repeat load']
 
@@ -41,12 +41,13 @@ export function ExerciseCard({ slot, value, previous, isActive, onChange, onActi
   const [selectedOptionName, setSelectedOptionName] = useState(initialOptionName)
   const [customTag, setCustomTag] = useState('')
   const selectedOption = (slot.options.find((option) => option.name === selectedOptionName) ?? slot.options[0])!
+  const equipmentType = inferEquipmentType(selectedOption)
 
   useEffect(() => {
     setSelectedOptionName(value?.selectedOptionName ?? slot.options[0]?.name ?? '')
   }, [slot.id, slot.options, value?.selectedOptionName])
   const log = useMemo<ExerciseLog>(() => {
-    const sets = value?.sets?.length ? value.sets : previous?.sets?.length ? previous.sets : buildEmptySets(slot.setCount)
+    const sets = value?.sets?.length ? value.sets : previous?.sets?.length ? previous.sets : buildEmptySets(slot.setCount, equipmentType === 'bodyweight' ? 'BW' : '')
     return {
       exerciseSlotId: slot.id,
       selectedOptionName,
@@ -54,9 +55,8 @@ export function ExerciseCard({ slot, value, previous, isActive, onChange, onActi
       difficulty: value?.difficulty ?? 'good',
       notes: value?.notes ?? ''
     }
-  }, [previous?.sets, selectedOptionName, slot.id, slot.setCount, value])
+  }, [equipmentType, previous?.sets, selectedOptionName, slot.id, slot.setCount, value])
   const hint = progressionHint(slot, value, previous)
-  const equipmentType = inferEquipmentType(selectedOption)
   const completedCount = log.sets.filter((set) => set.weight.trim() && set.reps.trim()).length
   const selectedTags = parseTags(log.notes)
 
@@ -109,7 +109,7 @@ export function ExerciseCard({ slot, value, previous, isActive, onChange, onActi
         <div>
           <span className="muscle-pill">{slot.muscleGroup}</span>
           <h2>{slot.title}</h2>
-          <p>{slot.setCount} sets · {slot.repRange} reps · {Math.round(slot.restSeconds / 60)} min rest</p>
+          <p>{slot.setCount} sets · target {slot.repRange} · {Math.round(slot.restSeconds / 60)} min rest</p>
           <button className="link-button" type="button" onClick={onShowHistory}>View history</button>
         </div>
         <div className={`progression-hint ${hint.tone}`}>
@@ -133,12 +133,12 @@ export function ExerciseCard({ slot, value, previous, isActive, onChange, onActi
             <div className="set-box" key={`${slot.id}-set-${index}`}>
               <span>Set {index + 1}</span>
               <label>
-                Weight
-                <input inputMode="decimal" value={set.weight} onChange={(event) => updateSet(index, 'weight', event.target.value)} placeholder="lb" aria-label={`Set ${index + 1} weight`} />
+                Load
+                <input inputMode="decimal" value={set.weight} onChange={(event) => updateSet(index, 'weight', event.target.value)} placeholder={equipmentType === 'bodyweight' ? 'BW' : 'lb'} aria-label={`Set ${index + 1} load`} />
               </label>
               <label>
-                Reps
-                <input inputMode="numeric" value={set.reps} onChange={(event) => updateSet(index, 'reps', event.target.value)} placeholder="reps" aria-label={`Set ${index + 1} reps`} />
+                Reps / sec
+                <input inputMode="numeric" value={set.reps} onChange={(event) => updateSet(index, 'reps', event.target.value)} placeholder="reps" aria-label={`Set ${index + 1} reps or seconds`} />
               </label>
             </div>
           ))}
@@ -195,12 +195,12 @@ export function ExerciseCard({ slot, value, previous, isActive, onChange, onActi
 
       <details className="instruction-panel">
         <summary>
-          <span>Machine notes</span>
+          <span>Movement notes</span>
           <strong>{selectedOption.name}</strong>
         </summary>
         <div className="instruction-grid">
           <section>
-            <h3>Looks like</h3>
+            <h3>What it looks like</h3>
             <p>{selectedOption.machineLooksLike}</p>
           </section>
           <section>

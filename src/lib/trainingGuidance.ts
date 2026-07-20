@@ -24,7 +24,7 @@ const goalCue: Record<Goal, string> = {
 const profileCue: Record<BodyProfile, string> = {
   lean: 'Add small jumps slowly; prioritize food, sleep, and full-range reps.',
   balanced: 'Use the written plan as-is and adjust only when recovery says so.',
-  larger: 'Bias joint-friendly machines, steady tempo, and repeatable weekly volume.',
+  larger: 'Bias joint-friendly variations, steady tempo, and repeatable weekly volume.',
   returning: 'Start conservative; win the habit before pushing set difficulty.'
 }
 
@@ -38,6 +38,6 @@ export const progressionBias = (settings: TrainingSettings) => {
   if (settings.goal === 'muscle-gain') return 'Add one clean set or a small load jump when recovery is solid.'
   if (settings.goal === 'strength') return 'Rest longer on the first lift and keep back-off work controlled.'
   if (settings.bodyProfile === 'lean') return 'Small load jumps beat big jumps missed next week.'
-  if (settings.bodyProfile === 'larger') return 'Prefer stable machine paths and smooth knees/shoulders over max load.'
+  if (settings.bodyProfile === 'larger') return 'Prefer stable variations and smooth knees/shoulders over max resistance.'
   return 'Use the base progression and let logged difficulty steer jumps.'
 }
