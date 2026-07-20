@@ -24,10 +24,13 @@ Existing users remain on the gym program. Choosing Home bodyweight in Settings i
 - `npm run build` — passed; Vite produced the production bundle.
 - `node --check server/index.js` — passed.
 - `git diff --check` — passed.
+- Production Docker build — passed at commit `af735ecb63e6cd1560baf42a8e4c3f3927dc4fdd`.
+- Production container `gym-app-1` — running; startup log confirms the server is listening on port 3000.
+- `https://gym.sardistic.com/` — HTTP 200; the served JavaScript bundle contains `Home bodyweight`.
 
-## Uncommitted implementation details
+## Repository state
 
-Implementation changes are present in `src/`, `server/index.js`, `README.md`, and these agent documents. Two pre-existing untracked PNG files remain untouched and are unrelated to this work.
+The implementation is committed and pushed to `main` in commit `af735ec`. Two pre-existing untracked PNG files remain untouched and are unrelated to this work.
 
 ## Unresolved risks
 
@@ -36,8 +39,8 @@ Implementation changes are present in `src/`, `server/index.js`, `README.md`, an
 
 ## Next concrete action
 
-Manually open Settings, select Home bodyweight, and spot-check program switching plus a `BW` set log in the deployed or local UI. Add an E2E smoke test if program switching becomes a critical release path.
+Manually open Settings in production, select Home bodyweight, and spot-check a `BW` set log. Add an E2E smoke test if program switching becomes a critical release path.
 
 ## Deployment/status impact
 
-Not deployed, committed, or pushed in this turn. A production build was generated locally.
+Deployed commit `af735ec` to the self-hosted gym Docker Compose service on 2026-07-19. The production container was rebuilt and recreated successfully, and `gym.sardistic.com` is serving the new bundle.
