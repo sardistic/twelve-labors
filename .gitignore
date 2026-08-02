@@ -6,3 +6,7 @@ dist
 *.log
 *.tsbuildinfo
 /data
+
+# Agent handoff notes stay local. They are written after the deploy, so
+# committing them leaves every deploy checkout one commit behind GitHub.
+docs/agent/HANDOFF.md
