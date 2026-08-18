@@ -466,11 +466,23 @@ const runReminderSweep = async () => {
   }
 }
 
+// A client-side route never carries a file extension, never starts with a dot,
+// and never lives under /api/. Anything matching this that is not on disk is a
+// scanner probe (/.env, /admin/certificate.pem) or a caller on the wrong host,
+// so it has to 404: falling back to index.html answered every probe with 200,
+// which let scanners sweep for free and made each hit a Cloudflare "visit".
+const notASpaRoute = /^\/api\/|^\/\.|\.[a-z0-9]+$/i
+
 const serveStatic = async (request, response) => {
   const url = new URL(request.url ?? '/', `http://${request.headers.host}`)
   const safePath = url.pathname === '/' ? 'index.html' : url.pathname.slice(1)
   const filePath = resolve(distDir, safePath)
-  const target = filePath.startsWith(distDir) && existsSync(filePath) ? filePath : join(distDir, 'index.html')
+  const found = filePath.startsWith(distDir) && existsSync(filePath)
+  if (!found && notASpaRoute.test(url.pathname)) {
+    response.writeHead(404, { 'Content-Type': 'text/plain' })
+    return response.end('Not Found')
+  }
+  const target = found ? filePath : join(distDir, 'index.html')
   const types = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.png': 'image/png', '.webmanifest': 'application/manifest+json' }
   response.writeHead(200, { 'Content-Type': types[extname(target)] ?? 'application/octet-stream' })
   response.end(await readFile(target))
